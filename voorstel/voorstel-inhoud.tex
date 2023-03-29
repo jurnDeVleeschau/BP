@@ -1,0 +1,45 @@
+%---------- Inleiding ---------------------------------------------------------
+
+\section{Introductie}%
+\label{sec:introductie}
+
+In het kader van de opleiding Toegepaste Informatica HoGent worden de Big Data frameworks Hadoop, Spark en Kafka gebruikt. Het is niet eenvoudig om deze software te installeren op de laptop van de student, hiermee gaat kostbare leertijd verloren.
+De doelstelling is uit te zoeken of containertechnologie kan gebruikt worden om deze verschillende applicaties te installeren op het VIC\footnote{HoGent Virtual IT Company}, rekening houdende met vereisten als efficiënt gebruik van hulpbronnen, beveiliging en stabiliteit (gebruikers van elkaar afschermen), schaalbaarheid en logging.
+De bedoeling is dat de resultaten van dit onderzoek in de volgende jaren kunnen gebruikt worden om de lessen van het vak ``Big Data Processing'' te faciliteren.
+
+%---------- Stand van zaken ---------------------------------------------------
+
+\section{State-of-the-art}%
+\label{sec:state-of-the-art}
+Hadoop en Spark, beide ontwikkeld door de Apache Software Foundation, zijn veelgebruikte open-source frameworks voor big data- architecturen. Elk framework bevat open-source technologieën die big data sets voorbereiden, beheren en verwerken.
+Beiden verdelen de processing van grote data sets over een cluster van computernodes.
+Hadoop word vaak als basis voor een big data architecture gebruikt terwijl Spark sneller MapReduce doet door RAM te gebruiken en daardoor ook sneller is voor kleinere datasets die volledig in het RAM geheugen passen. Kafka word gebruikt naast Hadoop om real-time data streams te verzamelen.(\autocite{Hadoop} \autocite{Spark} \autocite{Kafka})
+Hadoop, Spark en Kafka worden al samen gebruikt volgens \autocite{Holmes2012}:
+'In this situation, you'd use Kafka to both land data on Hadoop and provide a feed into a real-time data-streaming system such as Storm or Spark Streaming, which you could then use to perform near-real-time computations.' en \autocite{Leang2019}:
+'one of the more significant findings to emerge from this study is that the integration of the Hadoop system especially Apache Kafka and Apache Spark enhances the performance and accuracy of data storing, processing, and securing in the manufacturing environment.'
+
+Er is informatie te vinden over het gebruik van Docker om verschillende combinaties van 2 van de 3 frameworks te installeren maar niks over alle 3 samen, zeker niet met de requirements die wij willen onderzoeken. 
+
+% Voor literatuurverwijzingen zijn er twee belangrijke commando's:
+% \autocite{KEY} => (Auteur, jaartal) Gebruik dit als de naam van de auteur
+%   geen onderdeel is van de zin.
+% \textcite{KEY} => Auteur (jaartal)  Gebruik dit als de auteursnaam wel een
+%   functie heeft in de zin (bv. ``Uit onderzoek door Doll & Hill (1954) bleek
+%   ...'')
+
+%---------- Methodologie ------------------------------------------------------
+\section{Methodologie}%
+\label{sec:methodologie}
+Het onderzoek wordt gestart met een studie van de installaties van Hadoop, Spark en Kafka, en hun configuratie en onderlinge samenhang.
+Met een focus op de requirements zoals vermeld in de Introductie, zoals bijvoorbeeld beveiliging en schaalbaarheid.
+Startpunt is de documentatie op de website van de verschillende tools. Ik verwacht ook relevante artikels op het web te vinden, met gedetailleerde voorbeelden uit de praktijk.
+Een bron van informatie is zeker ook de cursus van het vak ``Big Data Processing'', om een goed zicht te hebben op de manier waarop de tools worden gebruikt.
+
+Om de installatievereisten te vertalen naar containertechnologie als Virtual Machines, Docker, Docker Compose en Kubernetes, volgt er ook een studie van deze, opnieuw met als startpunt de website van de verschillende tools.
+Hierbij wordt er rekening gehouden met de mogelijkheden en technologieën zoals vandaag gebruikt in de infrastruktuur van het VIC. Om hierover meer te leren denk ik gebruik te maken van cursussen van VIC gerelateerde vakken van de richting OPS.
+
+%---------- Verwachte resultaten ----------------------------------------------
+\section{Verwacht resultaat, conclusie}%
+\label{sec:verwachte_resultaten}
+Ik verwacht dat het mogelijk zal zijn om de installatie en configuratie van de 3 frameworks te automatiseren, gebruik makende van Docker, Docker Compose en Kubernetes.
+De details hiervan zullen beschreven worden in mijn Bachelorproef, samen met voorbeelden van scripts, configuratie files en andere nodige artifacts om de installaties voor het vak ``Big Data Processing'' te faciliteren.
