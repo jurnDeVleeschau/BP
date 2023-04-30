@@ -1,3 +1,159 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx
+  labels:
+    app: nginx
+spec:
+  selector:
+    matchLabels:
+      app: nginx
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:alpine
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - mountPath: /etc/nginx/nginx.conf
+              subPath: nginx.conf
+              readOnly: true
+              name: nginx-conf
+            - mountPath: /etc/nginx/password.conf
+              subPath: password.conf
+              readOnly: true
+              name: password-conf
+            - mountPath: /usr/share/nginx/html # mount nginx-htmlroot volume to /usr/share/nginx/html
+              readOnly: true
+              name: nginx-htmlroot
+
+        - name: hadoop-namenode
+          image: bde2020/hadoop-namenode:2.0.0-hadoop3.2.1-java8
+          ports:
+            - containerPort: 9870 # WebUI for NameNode default 9870/9871
+            - containerPort: 9000
+          env:
+            - name: CLUSTER_NAME
+              value: test
+            - name: hadoop-env
+              valueFrom:
+                configMapKeyRef:
+                  name: confnginx
+                  key: hadoop.env
+          volumeMounts:
+            - mountPath: /hadoop/dfs/name
+              name: hadoop-namenode
+              
+        - name: hadoop-datanode
+          image: bde2020/hadoop-datanode:2.0.0-hadoop3.2.1-java8
+          ports:
+            - containerPort: 9864
+          env:
+            - name: SERVICE_PRECONDITION
+              value: "namenode:9870"
+            - name: hadoop-env
+              valueFrom:
+                configMapKeyRef:
+                  name: confnginx
+                  key: hadoop.env
+          volumeMounts:
+            - mountPath: /hadoop/dfs/data
+              name: hadoop-datanode
+        
+        - name: hadoop-resourcemanager
+          image: bde2020/hadoop-resourcemanager:2.0.0-hadoop3.2.1-java8
+          env:
+            - name: SERVICE_PRECONDITION
+              value: "namenode:9000 namenode:9870 datanode:9864"
+            - name: hadoop-env
+              valueFrom:
+                configMapKeyRef:
+                  name: confnginx
+                  key: hadoop.env
+
+        - name: hadoop-nodemanager
+          image: bde2020/hadoop-nodemanager:2.0.0-hadoop3.2.1-java8
+          ports:
+            - containerPort: 8088
+          env:
+            - name: SERVICE_PRECONDITION
+              value: "namenode:9000 namenode:9870 datanode:9864 resourcemanager:8088"
+            - name: hadoop-env
+              valueFrom:
+                configMapKeyRef:
+                  name: confnginx
+                  key: hadoop.env
+
+        - name: hadoop-historyserver
+          image: bde2020/hadoop-historyserver:2.0.0-hadoop3.2.1-java8
+          env:
+            - name: SERVICE_PRECONDITION
+              value: "namenode:9000 namenode:9870 datanode:9864 resourcemanager:8088"
+            - name: hadoop-env
+              valueFrom:
+                configMapKeyRef:
+                  name: confnginx
+                  key: hadoop.env
+          volumeMounts:
+            - name: hadoop-historyserver
+              mountPath: /hadoop/yarn/timeline
+
+      volumes:
+        - name: nginx-conf
+          configMap:
+            name: confnginx
+            items:
+              - key: nginx.conf
+                path: nginx.conf
+        - name: password-conf
+          configMap:
+            name: confnginx
+            items:
+              - key: password.conf
+                path: password.conf
+        - name: nginx-htmlroot
+          configMap:
+            name: confnginx
+            items:
+              - key: index.html
+                path: index.html
+
+        - name: hadoop-namenode
+          hostPath:
+            path: /hadoop/dfs/name
+            type: DirectoryOrCreate
+
+        - name: hadoop-datanode
+          hostPath:
+            path: /hadoop/dfs/data
+            type: DirectoryOrCreate
+
+        - name: hadoop-historyserver
+          hostPath:
+            path: /hadoop/yarn/timeline
+            type: DirectoryOrCreate
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx
+  labels:
+    name: nginx
+spec:
+  selector:
+    app: nginx
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+      name: nginx
+  type: LoadBalancer
+---
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -14,6 +170,10 @@ data:
         worker_connections  1024;
     }
     http {
+      upstream hadoop {
+      server 127.0.0.1:9870;
+      }
+
       include       /etc/nginx/mime.types;
       
       default_type  application/octet-stream;
@@ -37,7 +197,6 @@ data:
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_redirect off;
 
-        proxy_cache liferay_cache;
         proxy_cache_revalidate on;
         proxy_cache_use_stale error timeout http_500 http_502 http_503 http_504;
         proxy_cache_background_update on;
@@ -52,7 +211,11 @@ data:
 
         location /hadoop/ {
           rewrite ^/hadoop/(.*)$ /$1 break;
-          proxy_pass http://hadoop:3000;
+          proxy_pass http://hadoop;
+        }
+
+        location /health {
+          return 200;
         }
 
         location / {
@@ -120,152 +283,4 @@ data:
     MAPRED_CONF_yarn_app_mapreduce_am_env=HADOOP_MAPRED_HOME=/opt/hadoop-3.2.1/
     MAPRED_CONF_mapreduce_map_env=HADOOP_MAPRED_HOME=/opt/hadoop-3.2.1/
     MAPRED_CONF_mapreduce_reduce_env=HADOOP_MAPRED_HOME=/opt/hadoop-3.2.1/
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: nginx
-  labels:
-    app: nginx
-spec:
-  selector:
-    matchLabels:
-      app: nginx
-  replicas: 1
-  template:
-    metadata:
-      labels:
-        app: nginx
-    spec:
-      containers:
-        - name: nginx
-          image: nginx:alpine
-          ports:
-            - containerPort: 80
-          volumeMounts:
-            - mountPath: /etc/nginx/nginx.conf
-              subPath: nginx.conf
-              readOnly: true
-              name: nginx-conf
-            - mountPath: /etc/nginx/password.conf
-              subPath: password.conf
-              readOnly: true
-              name: password-conf
-            - mountPath: /usr/share/nginx/html # mount nginx-htmlroot volume to /usr/share/nginx/html
-              readOnly: true
-              name: nginx-htmlroot
-
-      volumes:
-        - name: nginx-conf
-          configMap:
-            name: confnginx
-            items:
-              - key: nginx.conf
-                path: nginx.conf
-        - name: password-conf
-          configMap:
-            name: confnginx
-            items:
-              - key: password.conf
-                path: password.conf
-        - name: nginx-htmlroot
-          configMap:
-            name: confnginx
-            items:
-              - key: index.html
-                path: index.html
-
-      containers:
-        - name: hadoop-namenode
-          image: bde2020/hadoop-namenode:2.0.0-hadoop3.2.1-java8
-          ports:
-            - containerPort: 9870
-            - containerPort: 9000
-          env:
-            - name: CLUSTER_NAME 
-              value: test
-          envFrom:
-            configMap:
-              name: hadoop.env    
-          volumeMounts:
-            - name: hadoop-namenode
-              mountPath: /hadoop/dfs/name
-      volumes:
-        - name: hadoop-namenode
-          hostPath:
-            path: /hadoop/dfs/name
-            type: DirectoryOrCreate
-
-      containers:
-        - name: hadoop-datanode
-          image: bde2020/hadoop-datanode:2.0.0-hadoop3.2.1-java8
-          env:
-            - name: SERVICE_PRECONDITION
-              value: "namenode:9870"
-          envFrom:
-            configMap:
-              name: hadoop.env    
-          volumeMounts:
-            - name: hadoop-datanode
-              mountPath: /hadoop/dfs/data
-      volumes:
-        - name: hadoop-datanode
-          hostPath:
-            path: /hadoop/dfs/data
-            type: DirectoryOrCreate
-
-
-      containers:
-        - name: hadoop-resourcemanager
-          image: bde2020/hadoop-resourcemanager:2.0.0-hadoop3.2.1-java8
-          env:
-            - name: SERVICE_PRECONDITION 
-              value: "namenode:9000 namenode:9870 datanode:9864"
-          envFrom:
-            configMap:
-              name: hadoop.env    
-
-      containers:
-        - name: hadoop-nodemanager
-          image: bde2020/hadoop-nodemanager:2.0.0-hadoop3.2.1-java8
-          env:
-            - name: SERVICE_PRECONDITION 
-              value: "namenode:9000 namenode:9870 datanode:9864 resourcemanager:8088"
-          envFrom:
-            configMap:
-              name: hadoop.env    
-
-      containers:
-        - name: hadoop-historyserver
-          image: bde2020/hadoop-historyserver:2.0.0-hadoop3.2.1-java8
-          env:
-            - name: SERVICE_PRECONDITION 
-              value: "namenode:9000 namenode:9870 datanode:9864 resourcemanager:8088"
-          envFrom:
-            configMap:
-              name: hadoop.env    
-          volumeMounts:
-            - name: hadoop-historyserver
-              mountPath: /hadoop/yarn/timeline
-      volumes:
-        - name: hadoop-historyserver
-          hostPath:
-            path: /hadoop/yarn/timeline
-            type: DirectoryOrCreate
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: nginx
-  labels:
-    name: nginx
-spec:
-  selector:
-    app: nginx
-  ports:
-    - protocol: TCP
-      port: 80
-      targetPort: 80
-      name: nginx
-  type: LoadBalancer
 ---
