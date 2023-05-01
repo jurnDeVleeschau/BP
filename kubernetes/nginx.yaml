@@ -48,7 +48,7 @@ spec:
           volumeMounts:
             - mountPath: /hadoop/dfs/name
               name: hadoop-namenode
-              
+
         - name: hadoop-datanode
           image: bde2020/hadoop-datanode:2.0.0-hadoop3.2.1-java8
           ports:
@@ -170,10 +170,6 @@ data:
         worker_connections  1024;
     }
     http {
-      upstream hadoop {
-      server 127.0.0.1:9870;
-      }
-
       include       /etc/nginx/mime.types;
       
       default_type  application/octet-stream;
@@ -195,7 +191,6 @@ data:
 
         proxy_set_header Host $host;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_redirect off;
 
         proxy_cache_revalidate on;
         proxy_cache_use_stale error timeout http_500 http_502 http_503 http_504;
@@ -210,8 +205,14 @@ data:
         auth_basic_user_file /etc/nginx/password.conf;
 
         location /hadoop/ {
+          proxy_set_header Host $http_host/hadoop;
+          proxy_redirect off;
           rewrite ^/hadoop/(.*)$ /$1 break;
-          proxy_pass http://hadoop;
+          proxy_pass http://127.0.0.1:9870/;
+          sub_filter 'action="/'  'action="/hadoop/';
+          sub_filter 'href="/'    'href="/hadoop/';
+          sub_filter 'src="/'     'src="/hadoop/';
+          sub_filter_once off;
         }
 
         location /health {
