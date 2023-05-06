@@ -1,18 +1,18 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: bigdata-hadoop
+  name: bigdata-spark
   labels:
-    app: bigdata-hadoop
+    app: bigdata-spark
 spec:
   selector:
     matchLabels:
-      app: bigdata-hadoop
+      app: bigdata-spark
   replicas: 1
   template:
     metadata:
       labels:
-        app: bigdata-hadoop
+        app: bigdata-spark
     spec:
       containers:
         - name: nginx
@@ -43,9 +43,6 @@ spec:
           envFrom:
             - configMapRef:
                 name: confhadoop
-          volumeMounts:
-            - mountPath: /hadoop/dfs/name
-              name: hadoop-namenode
 
         - name: hadoop-datanode
           image: bde2020/hadoop-datanode:2.0.0-hadoop3.2.1-java8
@@ -57,9 +54,6 @@ spec:
           envFrom:
             - configMapRef:
                 name: confhadoop
-          volumeMounts:
-            - mountPath: /hadoop/dfs/data
-              name: hadoop-datanode
         
         - name: hadoop-resourcemanager
           image: bde2020/hadoop-resourcemanager:2.0.0-hadoop3.2.1-java8
@@ -89,9 +83,31 @@ spec:
           envFrom:
             - configMapRef:
                 name: confhadoop
-          volumeMounts:
-            - name: hadoop-historyserver
-              mountPath: /hadoop/yarn/timeline
+
+        - name: spark-master
+          image: bde2020/spark-master:3.3.0-hadoop3.3
+          ports:
+            - containerPort: 8080
+            - containerPort: 7077
+            - containerPort: 4040
+            - containerPort: 18080
+          env:
+            - name: SPARK_MASTER_HOST
+              value: localhost
+            - name: INIT_DAEMON_STEP
+              value: setup_spark
+            - name: CORE_CONF_fs_defaultFS
+              value: hdfs://localhost:9000
+
+        - name: spark-worker
+          image: bde2020/spark-worker:3.3.0-hadoop3.3
+          ports:
+            - containerPort: 8081
+          env:
+            - name: SPARK_MASTER
+              value: spark://localhost:7077
+            - name: CORE_CONF_fs_defaultFS
+              value: hdfs://localhost:9000
 
       volumes:
         - name: nginx-conf
@@ -112,36 +128,21 @@ spec:
             items:
               - key: index.html
                 path: index.html
-
-        - name: hadoop-namenode
-          hostPath:
-            path: /hadoop/dfs/name
-            type: DirectoryOrCreate
-
-        - name: hadoop-datanode
-          hostPath:
-            path: /hadoop/dfs/data
-            type: DirectoryOrCreate
-
-        - name: hadoop-historyserver
-          hostPath:
-            path: /hadoop/yarn/timeline
-            type: DirectoryOrCreate
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: bigdata-hadoop
+  name: bigdata-spark
   labels:
-    name: bigdata-hadoop
+    name: bigdata-spark
 spec:
   selector:
-    app: bigdata-hadoop
+    app: bigdata-spark
   ports:
     - protocol: TCP
       port: 80
       targetPort: 80
-      name: bigdata-hadoop
+      name: bigdata-spark
   type: LoadBalancer
 ---
 apiVersion: v1
@@ -198,6 +199,30 @@ data:
       server {
         listen 80;
         listen [::]:80;
+        server_name www.spark.local;
+
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+
+        proxy_cache_revalidate on;
+        proxy_cache_use_stale error timeout http_500 http_502 http_503 http_504;
+        proxy_cache_background_update on;
+        proxy_cache_lock on;
+
+        resolver kube-dns.kube-system.svc.cluster.local valid=5s;
+
+        auth_basic "Access restricted";
+        auth_basic_user_file /etc/nginx/password.conf;
+
+        location / {
+          proxy_pass http://localhost:8080/;
+          proxy_redirect default;
+        }
+      }
+
+      server {
+        listen 80;
+        listen [::]:80;
         server_name www.hadoop.local;
 
         proxy_set_header Host $host;
@@ -214,8 +239,8 @@ data:
         auth_basic_user_file /etc/nginx/password.conf;
 
         location / {
-          proxy_redirect off;
           proxy_pass http://localhost:9870/;
+          proxy_redirect default;
         }
       }
     }
@@ -229,7 +254,7 @@ data:
     <ul>
     <li><pre>username: .Data.username </pre></li>
     <li><pre>password: .Data.password </pre></li>
-    <li><a href='/hadoop'>Hadoop</a></li>
+    <li><a href='/spark'>spark</a></li>
     </ul>
     </body>
     </html>
