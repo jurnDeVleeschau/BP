@@ -60,33 +60,6 @@ spec:
             - configMapRef:
                 name: confkafka
 
-        - name: kafka2
-          image: confluentinc/cp-kafka:7.2.2
-          ports:
-            - containerPort: 9093
-            - containerPort: 29093
-            - containerPort: 19093
-          env:
-            - name: KAFKA_ADVERTISED_LISTENERS
-              value: "INTERNAL://localhost:19093,EXTERNAL://127.0.0.1:9093,DOCKER://localhost:29093"
-            - name: KAFKA_BROKER_ID
-              value: "2"
-
-        - name: kafka3
-          image: confluentinc/cp-kafka:7.2.2
-          ports:
-            - containerPort: 9094
-            - containerPort: 29094
-            - containerPort: 19094
-          env:
-            - name: KAFKA_ADVERTISED_LISTENERS
-              value: "INTERNAL://localhost:19094,EXTERNAL://127.0.0.1:9094,DOCKER://localhost:29094"
-            - name: KAFKA_BROKER_ID
-              value: "3"
-          envFrom:
-            - configMapRef:
-                name: confkafka
-
         - name: kafka-schema-registry
           image: confluentinc/cp-schema-registry:7.2.2
           ports:
@@ -95,7 +68,7 @@ spec:
             - name: SCHEMA_REGISTRY_HOST_NAME
               value: "kafka-schema-registry"
             - name: SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS
-              value: 'PLAINTEXT://localhost:19092,PLAINTEXT://localhost:19093,PLAINTEXT://localhost:19094'
+              value: 'PLAINTEXT://localhost:19092'
             - name: SCHEMA_REGISTRY_LISTENERS
               value: "http://0.0.0.0:8081"
 
@@ -214,7 +187,7 @@ data:
         auth_basic_user_file /etc/nginx/password.conf;
 
         location / {
-          proxy_pass http://localhost:9870/;
+          proxy_pass http://localhost:9092/;
           proxy_redirect default;
         }
       }
@@ -245,4 +218,5 @@ data:
   KAFKA_LOG4J_LOGGERS: "kafka.controller=INFO,kafka.producer.async.DefaultEventHandler=INFO,state.change.logger=INFO"
   KAFKA_AUTHORIZER_CLASS_NAME: "kafka.security.authorizer.AclAuthorizer"
   KAFKA_ALLOW_EVERYONE_IF_NO_ACL_FOUND: "true"
+  KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: "1"
 ---
