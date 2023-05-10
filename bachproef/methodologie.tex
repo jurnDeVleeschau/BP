@@ -391,36 +391,36 @@ properties.setProperty(, );
 - Enkel WEB UI beveiligd toegankelijk
 
 \subsection{Testen}
+\section{Mogelijke TODO}
+hadoop commandos
 
-\section{hadoop commandos}
-
-\section{SSH/Hadoop container}
+\subsection{SSH/Hadoop container}
 
 Indien nodig om hadoop commandos uit te voeren zonder lokaal te installeren.
 
-\section{TODO}
 
-\section{Kafka security}
 
-\section{ssh container met hadoop}
+\subsection{Kafka security}
+
+\subsection{ssh container met hadoop}
 \begin{lstlisting}
 "kafka.sasl.jaas.config": 'org.apache.kafka.common.security.plain.PlainLoginModule required username="USERNAME" password="PASSWORD";',
 "kafka.sasl.mechanism": "PLAIN",
 "kafka.security.protocol" : "SASL_SSL",
 \end{lstlisting}
-\section{Spark lees/schrijven op hdfs}
+\subsection{Spark lees/schrijven op hdfs}
  (org.apache.spark.sql)
 In the mapping task, set the Spark session property spark.driver.extraJavaOptions to the following value: -Dhttp.proxyHost=<host> -Dhttp.proxyPort=<port> -Dhttp.proxyUser=<user> -Dhttp.proxyPassword=<password>
 
-\section{Spark submit van applicatie op Hadoop Yarn}
+\subsection{Spark submit van applicatie op Hadoop Yarn}
 
-\section{Documentatie voor installatie}
+\subsection{Documentatie voor installatie}
 
 - Scripts/Optimalisatie voor installatie
 - Voor meerdere studenten
 - Op vSphere
 
-\section{Conclusie}
+\subsection{Conclusie}
 
 - Op Kubernetes
 - Lokaal install + yaml files
