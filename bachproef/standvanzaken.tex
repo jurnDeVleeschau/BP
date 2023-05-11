@@ -16,11 +16,11 @@
 
 %\lipsum[7-20]
 
-Met dit onderzoek is het de bedoeling tot een goed voorstel tot oplossing te komen om de installatie van de nodige software voor de oefeningen van het vak Big Data aan HoGent zoveel mogelijk te automatiseren.
+Met dit onderzoek is het de bedoeling tot een goede oplossing te komen om de installatie van de nodige software voor de oefeningen van het vak Big Data Processing aan HoGENT zoveel mogelijk te automatiseren.
 Meer concreet worden tijdens deze oefeningen de applicaties Hadoop, Spark en Kafka gebruikt. Momenteel wordt deze software geïnstalleerd tijdens de les zelf en dat is verlies van tijd die nuttiger zou zijn voor het gebruik van de applicaties in plaats van voor de installatie ervan. 
 \newline
 \newline
-Een extra doelstelling is om deze applicaties ook tijdens de examens te laten gebruiken op een centrale installatie van HoGent, uit veiligheid en stabiliteit.
+Een extra doelstelling is om deze applicaties ook tijdens de examens te kunnen gebruiken op een centrale installatie van HoGENT, met inachtname van veiligheid en stabiliteit.
 \newline
 \newline
 Voor het gebruik van deze applicaties zijn typisch telkens 2 ervan nodig, bijvoorbeeld Hadoop in combinatie met Spark of Spark in combinatie met Kafka. Meer hierover verder in dit hoofdstuk.
@@ -29,7 +29,6 @@ Voor het gebruik van deze applicaties zijn typisch telkens 2 ervan nodig, bijvoo
 Gezien het doel van deze studie, te komen tot een installatie ter ondersteuning van de oefeningen, zal het onderzoek zich vooral focussen op de functionaliteiten die tijdens de les gebruikt worden en op aspecten van belang voor de installatie, niet op de volledige werking van de verschillende softwares.
 \newline
 \newline
-We zijn vertrokken van het idee dat de beste aanpak het gebruik van containertechnologie is, die typisch toelaat om dergelijke volledig voorgedefinieerde installaties geautomatiseerd uit te voeren.
 
 \section{Containertechnologie}
 Container technology is a lightweight, executable unit of software that packs up application code and dependencies such as binary code, libraries, and configuration files for easy deployment across different computing environments \autocite{Solarwinds2023}.
@@ -41,7 +40,12 @@ Containers are an abstraction at the app layer that packages code and dependenci
 Met containertechnologie wordt de basis van het Operating Systeem gedeeld met de verschillende containers in tegenstelling tot Virtual Machines, die kunnen aanzien worden als een voorganger van containers, waar een volledige `virtuele computer` telkens wordt gebruikt, inclusief het Operating Systeem. Hierdoor zijn containers veel kleiner, zowel wat disk space als geheugen betreft.
 \newline
 \newline
-De meest gebruikte containersoftware's zijn Docker, CRI-O, rktlet, Containerd en runC. Rekening houdende met andere vereisten, o.a. installatie op het VIC, zie verder, hebben we besloten gebruik te maken van Docker.
+De meest gebruikte containersoftware is Docker en rekening houdende met andere zaken zoals
+\begin{itemize}
+    \item De VIC omgeving: Docker containers worden als de-facto standaard ondersteund op vSphere e winnen aan belang ten opzichte van virtuele machines
+    \item De Big Data applicaties: deze zijn allemaal beschikbaar als Docker Image
+\end{itemize}
+is de keuze genomen om te werken met Docker containers.
 
 \subsection{Docker}
 Docker is a software platform that allows you to build, test, and deploy applications quickly. Docker packages software into standardized units called containers that have everything the software needs to run including libraries, system tools, code, and runtime. Using Docker, you can quickly deploy and scale applications into any environment and know your code will run. \autocite{AwsAmazon2023}
@@ -55,9 +59,11 @@ A Docker image is a lightweight, standalone, executable package of software that
 \newline
 Docker images gebruiken een `parent` image, bijvoorbeeld een basis Linux container image, waaraan dan via commandos in de Dockerfile (een definitie tekst file) software wordt toegevoegd. De nieuwe image die op die manier wordt gemaakt verwijst naar de parent image maar bevat deze niet. Er wordt een `laag` aangemaakt die dan samen met de parent image kan uitgevoerd worden. Samen vormen ze de nieuwe image.
 Deze kan op zijn beurt gebruikt worden als parent voor een andere image, die dan al uit 3 image lagen zal bestaan. Dit vormt een besparing op disk space en netwerk communicatie, want de images worden typisch centraal opgeslagen op DockerHub zodat ze door anderen kunnen gebruikt worden.
-Merk op dat dit betekent dat de inhoud van deze image layers niet kan gewijzigd worden, anders zou de container met Image A gebaseerd op Image X de inhoud wijzigen van Image B ook gebaseerd op Image X. Daarom introduceert Docker het concept van een volume. Dit is een opslagplaats waarvan de container kan gebruik maken, maar een volume maakt deel uit van de omgeving waar de container draait, bestaat dus buiten de container en blijft ook bestaan als de container is gestopt. Bijvoorbeeld voor een database container worden de databases zelf in een volume bewaart anders zou alles verloren gaan eens de container wordt gestopt.
+Merk op dat dit betekent dat de inhoud van deze image layers niet kan gewijzigd worden, anders zou de container met Image A gebaseerd op Image X de inhoud wijzigen van Image B ook gebaseerd op Image X. 
 
 \subsection{Volume}
+Om de container dus toe te laten gegevens te bewaren introduceert Docker het concept van een volume. Dit is een opslagplaats waarvan de container kan gebruik maken, maar een volume maakt deel uit van de omgeving waar de container draait, bestaat dus buiten de container en blijft ook bestaan als de container is gestopt. Bijvoorbeeld voor een database container worden de databases zelf in een volume bewaart anders zou alles verloren gaan eens de container wordt gestopt.
+
 Volumes are the preferred mechanism for persisting data generated by and used by Docker containers.
 The data is kept somewhere on storage attached to the host - often the local filesystem. The volume itself has a lifecycle that's longer than the container's, allowing it to persist until no longer needed. Volumes can be shared between containers. \autocite{Javatpoint2023}
 \newline
@@ -77,50 +83,63 @@ De volgende stap is het automatiseren van het gecombineerd opstarten van applica
 Docker Compose is a tool that was developed to help define and share multi-container applications. With Compose, we can create a YAML file to define the services and with a single command, can spin everything up or tear it all down. \autocite{Docker2023}
 \newline
 \newline
-Met een Docker Compose file definiëren de verschillende services die samenwerken. Elke service is gebaseerd op een Docker image, per service kunnen we volumes toevoegen, netwerken opzetten die toelaten aan de verschillende containers om te communiceren, dependencies tussen services (welke eerst moet gestart worden), parameters die bepalen wanneer een container moet herstart worden, enz. 
+In een Docker Compose file worden de verschillende services die samenwerken gedefiniëerd. Elke service is gebaseerd op een Docker image, per service kunnen we volumes toevoegen, netwerken opzetten die toelaten aan de verschillende containers om te communiceren, dependencies tussen services (welke eerst moet gestart worden), parameters die bepalen wanneer een container moet herstart worden, enz.
 \newline
 \newline
 Met 1 docker compose commando wordt de combinatie van services dan opgestart.
 \newline
 \newline
-Onze oplossing zal dus bestaan uit meerdere docker-compose files, telkens voor een combinatie van de Big Data applicaties.
+Onze oplossing zou dus kunnen bestaan uit meerdere docker-compose files, telkens voor een combinatie van de Big Data applicaties. Dit gaan we moeten uitzoeken.
 \newline
 \newline
-Aangezien het de bedoeling is om de oefeningen van de studenten zoveel mogelijk van elkaar gescheiden te houden, o.a. om te vermijden dat slechte code van 1 student de applicaties crasht of overbelast, gaan we op basis van de docker-compose files voor elke student een aparte omgeving creëren. Dit betekent dat elke applicatie/container voor elke student apart wordt opgestart maar het is niet de bedoeling dat dit manueel gebeurt, hiervoor bestaat software die toelaat om het beheer van containers te doen, op een automatische manier op te starten, monitoren, herstarten, afsluiten, enz.
-In de praktijk wordt bij Docker(Compose) containers Kubernetes gekozen als container management oplossing. Typisch wordt dit ook gebruikt om containers als `cluster` te beheren.
 
 \subsection{Cluster}
-A cluster in docker refers to multiple nodes joined. Containers are scheduled across the various nodes, and networking is configured with overlay networking to look similar to bridge networks to the containers, but across multiple nodes.\autocite{BMitch2019}
+Een cluster is een groep van computers of nodes die samenwerken en zich naar de gebruiker toe als 1 enkel systeem gedragen, waarbij het werk wordt verdeeld over de verschillende nodes. Dit laat toe om extra nodes op te starten bij meer belasting en terug af te sluiten om resources te sparen (Scalability), nodes te herstarten zonder dat de gebruiker er iets van merkt (Stability; Availability).\textcite{Nordhoff2020}
 \newline
 \newline
-At a high level, a computer cluster is a group of two or more computers, or nodes, that run in parallel to achieve a common goal. This allows workloads consisting of a high number of individual, parallelizable tasks to be distributed among the nodes in the cluster.\autocite{Nordhoff2020}
+Bij een Docker cluster, ook Docker swarm genoemd, worden de containers verdeeld over verschillende nodes door cluster management van de Docker engine zelf. Een swarm bestaat uit meerdere Docker hosts, waarop zowel een manager als een worker kunnen draaien, en waarbij de managers de gewenste containers verdelen over de worker nodes, rekening houdende met specificaties zoals welke opslag resources, netwerken en aantal instanties gewenst zijn. De Docker engine zorgt voor de connectiviteit tussen de containers, gelijkaardig aan ``bridge'' netwerken die containers binnen één enkele computer verbinden.\textcite{BMitch2019}
+TODO https://docs.docker.com/engine/swarm/key-concepts/ en verwijder BMitch2019
 \newline
 \newline
-Een cluster van nodes/containers gedraagt zich naar de gebruiker toe als 1 enkel systeem, maar het werk wordt verdeelt over de verschillende nodes. Dit laat toe om extra nodes op te starten bij meer belasting en terug af te sluiten om resources te sparen (Scalability), nodes te herstarten zonder dat de gebruiker er iets van merkt (Stability; Availability).
+Docker Swarm is een mogelijkheid voor de installatie en het beheer van Big Data oplossingen.
 \newline
 \newline
-Merk op dat de bedoeling in ons geval eerder is om meerdere `aparte` systemen op te starten, 1 voor elke gebruiker/student dus we gaan daarop focussen bij Kubernetes, de scalability door clustering is een pluspunt indien nodig zou blijken als de belasting zwaarder wordt kan er voor elke student een cluster met meerdere nodes komen.
+
 
 \subsection{Kubernetes}
-Kubernetes, or K8s for short, is an open-source container-orchestration tool designed by Google. It’s used for bundling and managing clusters of containerized applications — a process known as ‘orchestration’ in the computing world.
-Kubernetes handles this changeover automatically and efficiently by restarting, replacing, and killing failed containers that don’t respond to a health check.\autocite{Guthrie2022}
+Kubernetes, of K8s, is een open-source container oplossing ontworpen door Google. Het wordt gebruikt om groepen of clusters van applicaties binnen containers te beheren. Dit noemen we in de IT wereld ‘orkestratie’. (https://nl.wikipedia.org/wiki/Orkestratie_(informatica))
+\newline
+Kubernetes start en monitort containers, start extra containers indien nodig om de belasting aan te kunnen, en stopt en herstart automatisch containers die niet langer reageren.\textcite{Guthrie2022}
 \newline
 \newline
+De laatste jaren worden containers meer en meer gebruikt en Kubernetes is zowat de standaard geworden voor bedrijven om hun containers te beheren en automatiseren.
+(TODO) https://www.linkedin.com/pulse/kubernetes-the-de-facto-standard-deploy-operate-containerized-/
 \newline
-We kijken dus naar een oplossing bestaande uit Docker, Docker Compose en Kubernetes die we nu verder gaan onderzoeken, in hoeverre is dit mogelijk op het VIC van HoGent, voor bepaalde combinaties van de applicaties Hadoop, Spark en Kafka.
+\newline
+Een belangrijk onderdeel van Kubernetes is de netwerk communicatie. Er zijn meerdere types communicatie, namelijk die tussen containers in eenzelfde pod (eenvoudig gebruik van localhost), die tussen Pods onderling, en die van de buitenwereld naar een service, deze laatste is een manier om toegang te verlenen tot een applikatie die binnen de cluster op meerdere Pods draait.
+
+TODO https://kubernetes.io/docs/concepts/cluster-administration/networking/
+TODO https://kubernetes.io/docs/concepts/services-networking/service/
+\newline
+\newline
+We gaan dus zeker ook naar Kubernetes kijken en onderzoeken of het nuttig kan zijn bij het opzetten van onze oplossing.
 
 \section{Hadoop}
 Eerste enkele woordjes uitleg over de werking van Hadoop.
 \newline
 \newline
-The Apache Hadoop software library is a framework that allows for the distributed processing of large data sets across clusters of computers using simple programming models. It is designed to scale up from single servers to thousands of machines, each offering local computation and storage. Rather than rely on hardware to deliver high-availability, the library itself is designed to detect and handle failures at the application layer, so delivering a highly-available service on top of a cluster of computers, each of which may be prone to failures.\autocite{ASF2022}
+De Apache Hadoop oplossing is een raamwerk dat toelaat om grote sets van gegevens gedistribueerd te verwerken, waarbij die verdeling over clusters van computers toeganlijk ik via eenvoudige programmeermodellen, o.a. het gedistribueerde filesysteem HDFS.
+\newline
+Hadoop is ontworpen om als cluster gebruikt te worden, met fout detectie en afhandeling ervan, en kan gaan tot duizenden machines, elk met lokale verwerking en opslag. \textcite{ASF2022}
 
 \subsection{Hadoop Distributed File System}
 The Hadoop Distributed File System (HDFS) is a distributed file system designed to run on commodity hardware. It has many similarities with existing distributed file systems.
 However, the differences from other distributed file systems are significant. HDFS is highly fault-tolerant and is designed to be deployed on low-cost hardware. HDFS provides high throughput access to application data and is suitable for applications that have large data sets.\autocite{Borthakur2007a}
 \newline
 \newline
-Omn de data te verdelen over alle nodes die deelnemen aan de Hadoop cluster wordt HDFS gebruikt. Een cluster bestaat uit 1 of meerdere Master Nodes en veel meer Slave Nodes. De Master node houdt bij in welke Slave nodes de data zich bevindt. Meerdere copies van de data worden gerepliceerd over de verschillende nodes zodat er geen data verloren gaat bij uitvallen van een node.
+Omn de data te verdelen over alle nodes die deelnemen aan de Hadoop cluster wordt HDFS gebruikt, dit heeft een master/slave architectuur en laat toe om gegevens op te slaan in files die verdeeld worden over de cluster. Een cluster bestaat uit 1 master, de namenode en meerdere slaves, de datanodes. Een 2e namenode wordt gebruikt als 
+\newline
+De namenode houdt bij in welke datanodes de data zich bevindt. Meerdere copies van de data worden gerepliceerd over de verschillende datanodes zodat er geen data verloren gaat bij uitvallen van een datanode.
 
 \subsection{MapReduce}
 MapReduce is a programming model or pattern within the Hadoop framework that is used to access big data stored in the Hadoop File System (HDFS). It is a core component, integral to the functioning of the Hadoop framework.
@@ -129,11 +148,11 @@ MapReduce facilitates concurrent processing by splitting petabytes of data into 
 \includegraphics[scale=0.4]{mapreduce.jpg}
 \newline
 \newline
-Hadoop wordt o.a. alleenstaand gebruikt tijdens de oefeningen Big Data, daarvoor kunnen we bestaande Docker Compose files gebruiken die de verschillende services bevatten nodig om een Master of Slave te starten.
+Hadoop wordt o.a. alleenstaand gebruikt tijdens de oefeningen Big Data Processing, daarvoor kunnen we bestaande Docker Compose files gebruiken die de verschillende services bevatten nodig om een Master of Slave te starten.
 In de eenvoudigste vorm is er 1 docker compose file die alle services opstart om te kunnen werken met 1 master en 1 slave.
 \newline
 \newline
-Elke service (namenode, datanode, resourcemanager) is een specifiek Docker image, ook beschikbaar op DockerHub. Er zijn voorbeelden te vinden van de Docker scripts die gebruikt werden om dit soort images te bouwen. Typisch is er een basis Hadoop images dat het volledige framework bevat, en worden daar aparte images vanaf geleidt die telkens maar 1 specifiek process (namenode, datanode, ...) van Hadoop opstarten.
+Elke service (namenode, datanode, resourcemanager) is een specifiek Docker image, ook beschikbaar op DockerHub. Er zijn voorbeelden te vinden van de Docker scripts die gebruikt werden om dit soort images te bouwen. Typisch is er een basis Hadoop images dat het volledige framework bevat, en worden daar aparte images vanaf geleid die telkens maar 1 specifiek process (namenode, datanode, ...) van Hadoop opstarten.
 Door op die manier met aparte images te werken kan het beheer van de cluster buiten Hadoop worden gedaan, typisch in Kubernetes, zie verder.
 \newline
 \newline
@@ -144,7 +163,9 @@ Apache Spark is an open-source, distributed processing system used for big data 
 Spark was designed for fast, interactive computation that runs in memory, enabling machine learning to run quickly. The algorithms include the ability to do classification, regression, clustering, collaborative filtering, and pattern mining.\autocite{AwsAmazon2023a}
 \newline
 \newline
-Apache Spark is net als Hadoop een data processing engine voor big data. Spark verdeelt ook de taken en de gegevens over verschillende nodes, voor een aantal gevallen zal het sneller zijn dan Hadoop omdat het gebruik maakt van RAM geheugen in plaats van een bestandssysteem, dit is de Resilient Distributed Dataset (RDD).
+Apache Spark is net als Hadoop een data processing engine voor Big Data. Spark verdeelt ook de taken en de gegevens over verschillende nodes, voor een aantal gevallen zal het sneller zijn dan Hadoop omdat het gebruik maakt van RAM geheugen in plaats van een bestandssysteem.
+De data in Spark word verdeeld over een cluster opgeslagen, in eerdere versies in RDD (Resilient Distributed Dataset) zijnde een set van Java of Scala data objecten. In nieuwere versies van Spark wordt DataFrame gebruikt, waarbij de gegegvens gestructureerd worden in kolommen, gelijkaardig aan een tabel in een relationele databank.
+TODO https://data-flair.training/blogs/apache-spark-rdd-vs-dataframe-vs-dataset/
 \newline
 \newline
 Spark bevat meerder componenten om aan data verwerking te doen: Spark SQL, Spark MLlib en Spark GraphX.
@@ -219,10 +240,11 @@ Er is informatie te vinden over het gebruik van Docker compose om verschillende 
 
 
 \section{Virtual IT Company(VIC)}
-VIC is een ``bedrijf'' in Hogent dat virtuele machines voorziet voor studenten, zodat bepaalde oplossingen niet op een eigen computer moet draaien, en op aanvraag maken ze de virtuele machine(s), er wordt een soort van contract afgesproken met machine specs en lifespan.
+VIC is een ``bedrijf'' in HoGENT dat virtuele machines voorziet voor studenten, zodat bepaalde oplossingen niet op een eigen computer moet draaien, en op aanvraag maken ze de virtuele machine(s), er wordt een soort van contract afgesproken met machine specs en lifespan.
 \newline
 \newline
 VIC gebruikt de oplossing van VMWare (vSphere, VMWare ESXi Hypervisor) voor het beheer van virtuele machines op de eigen hardware.
+TODO
 
 \subsection{Hypervisor}
 A hypervisor, also known as a virtual machine monitor or VMM, is software that creates and runs virtual machines (VMs). A hypervisor allows one host computer to support multiple guest VMs by virtually sharing its resources, such as memory and processing.\autocite{VMware2023a}

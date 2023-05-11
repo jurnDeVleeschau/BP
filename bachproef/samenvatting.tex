@@ -33,17 +33,38 @@
 % Wie zijn bachelorproef in het Nederlands schrijft, kan dit negeren, de inhoud
 % wordt niet in het document ingevoegd.
 
-\IfLanguageName{english}{%
-\selectlanguage{dutch}
-\chapter*{Samenvatting}
-\lipsum[1-4]
-\selectlanguage{english}
-}{}
+% \IfLanguageName{english}{%
+% \selectlanguage{dutch}
+% \chapter*{Samenvatting}
+% \selectlanguage{english}
+% }{}
 
 %%---------- Samenvatting -----------------------------------------------------
 % De samenvatting in de hoofdtaal van het document
 
 \chapter*{\IfLanguageName{dutch}{Samenvatting}{Abstract}}
 
-In het kader van de opleiding Toegepaste Informatica HoGent worden de Big Data frameworks Hadoop, Spark en Kafka lokaal op de laptop van de student geïnstalleerd.
-De doelstelling van deze studie is uit te zoeken of containertechnologie kan gebruikt worden om die gecombineerde installatie van Big Data frameworks te automatiseren, met een focus op efficiënt gebruik van resources, security en stabiliteit, schaalbaarheid en logging. Hiervoor zullen de installatie en configuratie van deze frameworks in detail bestudeerd worden en is er tot een werkende oplossing gekomen, op basis van Docker en Kubernetes, die dan kan gebruikt worden om de software voor de lessen van het vak ``Big Data Processing'' te installeren.
+In het kader van de opleiding Toegepaste Informatica HoGent worden de Big Data frameworks Hadoop, Spark en Kafka lokaal op de laptop van de student geïnstalleerd voor de oefeningen.
+De doelstelling van deze studie is uit te zoeken of containertechnologie kan gebruikt worden om die gecombineerde installaties van Big Data frameworks te automatiseren, met een focus op efficiënt gebruik van resources, security en stabiliteit, schaalbaarheid en logging. De bedoeling is dat de resultaten van dit onderzoek in de volgende jaren kunnen gebruikt worden om de lessen van het vak ``Big Data Processing'' te faciliteren.
+\newline
+\newline
+Hiervoor werden de installatie en configuratie van deze frameworks bestudeerd om tot een werkende oplossing te komen, daarbij werden Docker (Compose) en Kubernetes bekeken, die kunnen gebruikt worden om de software centraal te installeren, en niet langer op de laptop van de student.
+\newline
+\newline
+Tijdens het onderzoek bleek al snel dat de 3 Big Data oplossingen zeer verschillend zijn en dus voor alle vereisten telkens een andere aanpak en oplossing nodig is.
+Het zijn ook geen eenvoudige applikaties, en er zijn weinig of geen relevante tutorials of Blog artikels over te vinden wat dus betekent dat ik telkens de volledige handleidingen moest doorspitten op zoek naar antwoorden. Ook ontmoedigend was het feit dat er regelmatig gesteld werd dat je al goede kennis en ervaring moest hebben van een onderdeel alvorens eraan te beginnen. Bijvoorbeeld security en Kerberos.
+\newline
+Er moesten dus keuzes gemaakt worden om binnen de beperkte tijd van de bachelorproef haalbare configuraties te bedenken en realiseren.
+\newline
+\newline
+Om tot een oplossing te komen die op het VIC kan geïnstalleerd worden kwam ik al snel te weten dat Kubernetes de enige mogelijkheid met toekomst is, want Docker Compose en Docker Swarm worden niet langer ondersteund in de laatste versies van VMWare vSphere.
+\newline
+\newline
+Uit de testen die ik deed blijkt dat het zeker mogelijk is om alle installaties te doen op een Kubernetes omgeving, dus ook op het VIC. In grote lijnen zijn er 2 manieren, namelijk een gedeelde omgeving voor alle studenten waarbij de aspecten veiligheid en stabiliteit eerder complex te configureren zijn, en waarvoor er in de praktijk meestal bijkomende oplossingen gebruikt worden, en een geïsoleerde omgeving voor elke student waarbij er automatisch isolatie en stabiliteit is, maar waarbij er nog steeds afscherming/veiligheid moet opgezet worden.
+Bij een gedeelde omgeving draait elke Big Data oplossing in een eigen cluster met communicatie tussen de eigen Pods, en is er nog eens communicatie tussen de clusters. Dit opzetten is dus veel meer configuratie dan de geïsoleerde omgeving.
+\newline
+Voor deze reden, en nog andere die verder in detail worden besproken, is mijn conclusie dat de eenvoudigste oplossing voor installatie van de Big Data frameworks op het VIC een geïsoleerde omgeving voor elke student is.
+\newline
+\newline
+Als laatste opmerking wou ik er nog op wijzen dat er tijdens de lessen gebruikt gemaakt wordt van het feit dat de applikaties lokaal draaien in Docker, er wordt o.a. Docker exec gebruikt om toegang te hebben tot een lokale Hadoop container en command omgeving om van daaruit Hadoop te beheren. Dit is niet beschikbaar eens de applikaties in de cloud (VIC) draaien. Hiervoor moet nog een oplossing bedacht worden, eventueel toch nog 1 enkele Docker container lokaal als Hadoop client, of een SSH container toevoegen aan elke student omgeving.
+\newline
