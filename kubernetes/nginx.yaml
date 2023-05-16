@@ -28,7 +28,7 @@ spec:
               subPath: password.conf
               readOnly: true
               name: password-conf
-            - mountPath: /etc/nginx/ssl
+            - mountPath: /etc/nginx/ssl/
               readOnly: true
               name: nginx-secret-volume
 

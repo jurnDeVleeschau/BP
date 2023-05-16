@@ -44,6 +44,17 @@ spec:
               value: "2181"
             - name: ZOOKEEPER_SERVER_ID
               value: "1"
+            - name: KAFKA_OPTS
+              value: "-Djava.security.auth.login.config=/KAFKA_HOME/config/zookeeper_jaas.conf"
+          volumeMounts:
+            - mountPath: /KAFKA_HOME/config/zookeeper_jaas.conf
+              subPath: zookeeper_jaas.conf
+              readOnly: true
+              name: zookeeper-jaasconf
+            - mountPath: /config/zookeeper.properties
+              subPath: zookeeper.properties
+              readOnly: true
+              name: zookeeperproperties
 
         - name: kafka1
           image: confluentinc/cp-kafka:7.2.2
@@ -56,9 +67,30 @@ spec:
               value: "INTERNAL://localhost:19092,EXTERNAL://127.0.0.1:9092,DOCKER://localhost:29092"
             - name: KAFKA_BROKER_ID
               value: "1"
+            - name: KAFKA_OPTS
+              value: "-Djava.security.auth.login.config=/KAFKA_HOME/config/kafka_client_jaas.conf"
           envFrom:
             - configMapRef:
                 name: confkafka
+          volumeMounts:
+            - mountPath: /KAFKA_HOME/config/kafka_server_jaas.conf
+              subPath: kafka_server_jaas.conf
+              readOnly: true
+              name: kafka-server-jaasconf
+            - mountPath: /config/consumer.properties
+              subPath: consumerproperties
+              readOnly: true
+              name: consumerproperties
+            - mountPath: /config/producer.properties
+              subPath: producer.properties
+              readOnly: true
+              name: producerproperties
+            - mountPath: /config/server.properties
+              subPath: server.properties
+              readOnly: true
+              name: serverproperties
+
+              
 
         - name: kafka-schema-registry
           image: confluentinc/cp-schema-registry:7.2.2
@@ -95,6 +127,43 @@ spec:
               - key: index.html
                 path: index.html
 
+        - name: zookeeper-jaasconf
+          configMap:
+            name: confnginx
+            items:
+              - key: zookeeper_jaas.conf
+                path: zookeeper_jaas.conf
+
+        - name: kafka-server-jaasconf
+          configMap:
+            name: confnginx
+            items:
+              - key: kafka_server_jaas.conf
+                path: kafka_server_jaas.conf
+        - name: consumerproperties
+          configMap:
+            name: confnginx
+            items:
+              - key: consumer.properties
+                path: consumer.properties
+        - name: producerproperties
+          configMap:
+            name: confnginx
+            items:
+              - key: producer.properties
+                path: producer.properties
+        - name: zookeeperproperties
+          configMap:
+            name: confnginx
+            items:
+              - key: zookeeper.properties
+                path: zookeeper.properties
+        - name: serverproperties
+          configMap:
+            name: confnginx
+            items:
+              - key: server.properties
+                path: server.properties
 ---
 apiVersion: v1
 kind: Service
@@ -187,7 +256,7 @@ data:
         auth_basic_user_file /etc/nginx/password.conf;
 
         location / {
-          proxy_pass http://localhost:9092/;
+          proxy_pass http://localhost:2181/;
           proxy_redirect default;
         }
       }
@@ -206,6 +275,76 @@ data:
     </ul>
     </body>
     </html>
+  server.properties: |
+    security.inter.broker.protocol=SASL_PLAINTEXT
+    sasl.mechanism.inter.broker.protocol=PLAIN
+    sasl.enabled.mechanisms=PLAIN
+
+    authorizer.class.name=kafka.security.auth.SimpleAclAuthorizer
+    allow.everyone.if.no.acl.found=true
+    auto.create.topics.enable=false
+    broker.id=0
+    listeners=SASL_PLAINTEXT://localhost:9092
+    advertised.listeners=SASL_PLAINTEXT://localhost:9092
+    num.network.threads=3
+    num.io.threads=8
+    socket.send.buffer.bytes=102400
+    socket.receive.buffer.bytes=102400
+    socket.request.max.bytes=104857600
+
+    advertised.host.name=localhost
+    num.partitions=1
+    num.recovery.threads.per.data.dir=1
+    log.flush.interval.messages=30000000
+    log.flush.interval.ms=1800000
+    log.retention.minutes=30
+    log.segment.bytes=1073741824
+    log.retention.check.interval.ms=300000
+    delete.topic.enable=true
+    zookeeper.connect=localhost:2181
+    zookeeper.connection.timeout.ms=6000
+    super.users=User:admin
+  zookeeper.properties: |
+    authProvider.1=org.apache.zookeeper.server.auth.SASLAuthenticationProvider
+    requireClientAuthScheme=sasl
+    jaasLoginRenew=3600000
+    clientPort=2181
+  consumer.properties: |
+    security.protocol=SASL_PLAINTEXT
+    sasl.mechanism=PLAIN
+    zookeeper.connect=localhost:2181
+  producer.properties: |
+    sasl.mechanism=PLAIN
+    security.protocol=SASL_PLAINTEXT
+    sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required
+    username="admin"
+    password="admin-secret";
+    bootstrap.servers=localhost:9092
+  zookeeper_jaas.conf: |
+    Server {
+       org.apache.kafka.common.security.plain.PlainLoginModule required
+       username="admin"
+       password="admin-secret"
+       user_admin="admin-secret";
+    };
+    Client {
+      org.apache.zookeeper.server.auth.DigestLoginModule required
+      username="kafka"
+      password="kafka-secret";
+    };
+  kafka_server_jaas.conf: |
+    KafkaServer {
+       org.apache.kafka.common.security.plain.PlainLoginModule required
+       username="admin"
+       password="admin-secret"
+       user_admin="admin-secret";
+    };
+
+    Client {
+       org.apache.kafka.common.security.plain.PlainLoginModule required
+       username="admin"
+       password="admin-secret";
+    };
 ---
 apiVersion: v1
 kind: ConfigMap
