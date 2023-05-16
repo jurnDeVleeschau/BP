@@ -41,7 +41,7 @@ Een van de onderdelen van Hadoop is YARN, een resource manager en job scheduler 
 \newline
 Bij elk van de gebruikte applicaties moeten dus een aanzienlijk aantal nodes opgezet worden voor een basis cluster, gedefinieerd, geconfigureerd en geïnstalleerd. Kubernetes is een platform dat hiervoor typisch wordt gebruikt. Spark bijvoorbeeld kan rechtstreeks gebruikmaken van Kubernetes. Daarbij werkt Spark rechtstreeks met Kubernetes om Executors op Kubernetes Pods aan te maken en er applicaties op uit te voeren.
 \newline
-https://spark.apache.org/docs/latest/running-on-kubernetes.html
+TODO https://spark.apache.org/docs/latest/running-on-kubernetes.html
 \newline
 \newline
 Merk op dat het bij een real-world installatie van combinaties van deze 3 clusters, het meestal de bedoeling is dat de Big Data oplossingen achterliggend gebruikt worden door eigen applicaties en dat gewone ``gebruikers'' op geen enkele manier rechtstreeks toegang krijgen to bv. Hadoop of Spark. Bij de meeste installaties volstaat dan ook het om als beveiliging de netwerk toegang tot de Big Data oplossingen te beperken.
@@ -55,7 +55,7 @@ Dit is niet het geval voor ons, de bedoeling is juist dat de studenten rechtstre
 In een standaard configuratie wordt de Hadoop cluster beschermd door alle netwerk toegang te beperken. Als er daarnaast ook nog restricties nodig zijn op wie toegang krijgt tot de cluster, om gegevens te bekijken of applicaties te beheren, moeten authenticatie en toegangscontrole tot de cluster volledig geconfigureerd worden. Bij een Hadoop cluster die in 'secure mode' is opgezet, dient er voor elke Hadoop service en elke gebruiker authenticatie te gebeuren door Kerberos. Een extra oplossing die dit ondersteund is dan nodig.
 \newline
 \newline
-'Forward and reverse host lookup for all service hosts must be configured correctly to allow services to authenticate with each other. Host lookups may be configured using either DNS or /etc/hosts files.'\autocite{Hadoop2023a}
+'Forward and reverse host lookup for all service hosts must be configured correctly to allow services to authenticate with each other. Host lookups may be configured using either DNS or /etc/hosts files.'\autocite{Hadoop2023}
 \newline
 \newline
 Volgens de documentatie is een zeer goede kennis van Kerberos en DNS vereist om Hadoop services op te zetten in 'secure mode'.
@@ -156,7 +156,7 @@ Als eerste onderzoek voor dit security onderdeel is er, om de configuratie van d
 \newline
 \newline
 \subsubsection{Configmaps} 
-\autocite{Kubernetes2023e}
+\autocite{Kubernetes2023}
 \newline
 Een ConfigMap wordt gebruikt om niet-beveiligde configuratie gegevens te beheren in sleutel-waarde formaat, en ter beschikking te stellen van de Pods en Containers, als omgevingsvariabele of als (configuratie) bestand via een volume.
 Een ConfigMap bevat typisch de configuratie die is losgekoppeld van het Docker image om op die manier images meer generiek inzetbaar te maken.\textcite{Kubernetes2023}

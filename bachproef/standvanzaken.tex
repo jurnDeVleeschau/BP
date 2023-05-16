@@ -134,7 +134,7 @@ De namenode houdt bij in welke datanodes de data zich bevinden. Meerdere kopieë
 \newline
 \newline
 Initieel was HDFS bedoeld om een goede performantie en stabiliteit te garanderen op eerder goedkope hardware, en om het mogelijke falen hiervan op te vangen werd het ontworpen met een focus op verdeling en redundantie van de data. De ``fault-tolerance'' wordt op die manier verzekerd door de software en niet door high-end hardware.
-Door de architectuur van HDFS biedt het een goede performantie voor applicaties die nood hebben aan het verwerken van zeer grote datasets.\autocite{Borthakur2007a}
+Door de architectuur van HDFS biedt het een goede performantie voor applicaties die nood hebben aan het verwerken van zeer grote datasets.\autocite{Borthakur2007}
 \newline
 \newline
 \subsection{MapReduce}
@@ -206,8 +206,12 @@ Spark GraphX bevat een steeds groter wordende set van graaf bouwers en algorithm
 (\autocite{Dayananda2019}, \autocite{Wikipedia2023})
 \newline
 \newline
-\includegraphics[scale=0.2]{GraphX-Example-Spark-GraphX-Tutorial-Edureka.png}
-(https://www.edureka.co/blog/spark-graphx/)
+\begin{figure}
+    %\includegraphics[scale=0.4]{mapreduce.jpg}
+    \includegraphics[scale=0.2]{GraphX-Example-Spark-GraphX-Tutorial-Edureka.png}
+    \caption{https://www.edureka.co/blog/spark-graphx/}
+\end{figure}
+
 
 \subsection{Spark Streaming / Structured Streaming}
 Many applications need the ability to process and analyze not only batch data, but also streams of new data in real-time. Running on top of Spark, Spark Streaming enables powerful interactive and analytical applications across both streaming and historical data, while inheriting Spark’s ease of use and fault tolerance characteristics. It readily integrates with a wide variety of popular data sources, including HDFS, Flume, Kafka, and Twitter.\autocite{databricks2023}
