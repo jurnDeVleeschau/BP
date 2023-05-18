@@ -1,0 +1,298 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bigdata-hadoop
+  labels:
+    app: bigdata-hadoop
+spec:
+  selector:
+    matchLabels:
+      app: bigdata-hadoop
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: bigdata-hadoop
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:alpine
+          ports:
+            - containerPort: 443
+          volumeMounts:
+            - mountPath: /etc/nginx/nginx.conf
+              subPath: nginx.conf
+              readOnly: true
+              name: nginx-conf
+            - mountPath: /etc/nginx/password.conf
+              subPath: password.conf
+              readOnly: true
+              name: password-conf
+            - mountPath: /etc/nginx/ssl/
+              readOnly: true
+              name: nginx-secret-volume
+            - mountPath: /usr/share/nginx/html # mount nginx-htmlroot volume to /usr/share/nginx/html
+              readOnly: true
+              name: nginx-htmlroot
+
+        - name: hadoop-namenode
+          image: bde2020/hadoop-namenode:2.0.0-hadoop3.2.1-java8
+          ports:
+            - containerPort: 9870 # WebUI for NameNode default 9870/9871
+            - containerPort: 9000
+          env:
+            - name: CLUSTER_NAME
+              value: test
+          envFrom:
+            - configMapRef:
+                name: confhadoop
+          volumeMounts:
+            - mountPath: /hadoop/dfs/name
+              name: hadoop-namenode
+
+        - name: hadoop-datanode
+          image: bde2020/hadoop-datanode:2.0.0-hadoop3.2.1-java8
+          ports:
+            - containerPort: 9864
+          env:
+            - name: SERVICE_PRECONDITION
+              value: "localhost:9870"
+          envFrom:
+            - configMapRef:
+                name: confhadoop
+          volumeMounts:
+            - mountPath: /hadoop/dfs/data
+              name: hadoop-datanode
+        
+        - name: hadoop-resourcemanager
+          image: bde2020/hadoop-resourcemanager:2.0.0-hadoop3.2.1-java8
+          env:
+            - name: SERVICE_PRECONDITION
+              value: "localhost:9000 localhost:9870 localhost:9864"
+          envFrom:
+            - configMapRef:
+                name: confhadoop
+
+        - name: hadoop-nodemanager
+          image: bde2020/hadoop-nodemanager:2.0.0-hadoop3.2.1-java8
+          ports:
+            - containerPort: 8088
+          env:
+            - name: SERVICE_PRECONDITION
+              value: "localhost:9000 localhost:9870 localhost:9864 localhost:8088"
+          envFrom:
+            - configMapRef:
+                name: confhadoop
+
+        - name: hadoop-historyserver
+          image: bde2020/hadoop-historyserver:2.0.0-hadoop3.2.1-java8
+          env:
+            - name: SERVICE_PRECONDITION
+              value: "localhost:9000 localhost:9870 localhost:9864 localhost:8088"
+          envFrom:
+            - configMapRef:
+                name: confhadoop
+          volumeMounts:
+            - name: hadoop-historyserver
+              mountPath: /hadoop/yarn/timeline
+
+      volumes:
+        - name: nginx-conf
+          configMap:
+            name: confnginx
+            items:
+              - key: nginx.conf
+                path: nginx.conf
+        - name: password-conf
+          configMap:
+            name: confnginx
+            items:
+              - key: password.conf
+                path: password.conf
+        - name: nginx-secret-volume
+          secret:
+            secretName: nginxsecret
+        - name: nginx-htmlroot
+          configMap:
+            name: confnginx
+            items:
+              - key: index.html
+                path: index.html
+
+        - name: hadoop-namenode
+          hostPath:
+            path: /hadoop/dfs/name
+            type: DirectoryOrCreate
+
+        - name: hadoop-datanode
+          hostPath:
+            path: /hadoop/dfs/data
+            type: DirectoryOrCreate
+
+        - name: hadoop-historyserver
+          hostPath:
+            path: /hadoop/yarn/timeline
+            type: DirectoryOrCreate
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: bigdata-hadoop
+  labels:
+    name: bigdata-hadoop
+spec:
+  selector:
+    app: bigdata-hadoop
+  ports:
+    - protocol: TCP
+      port: 443
+      targetPort: 443
+      name: bigdata-hadoop
+  type: LoadBalancer
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: confnginx
+data:
+  nginx.conf: |
+    user  nginx;
+    worker_processes  1;
+
+    error_log  /var/log/nginx/error.log warn;
+    pid        /var/run/nginx.pid;
+
+    events {
+        worker_connections  1024;
+    }
+    http {
+      include       /etc/nginx/mime.types;
+      
+      default_type  application/octet-stream;
+
+      log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                          '$status $body_bytes_sent "$http_referer" '
+                          '"$http_user_agent" "$http_x_forwarded_for"';
+
+      access_log  /var/log/nginx/access.log  main;
+
+      sendfile        on;
+
+      keepalive_timeout  65;
+
+      server {
+        listen 443 ssl;
+        listen [::]:443 ssl;
+        server_name localhost;
+        ssl_certificate     /etc/nginx/ssl/tls.crt;
+        ssl_certificate_key /etc/nginx/ssl/tls.key;
+        ssl_protocols       TLSv1 TLSv1.1 TLSv1.2;
+        ssl_ciphers         HIGH:!aNULL:!MD5;
+
+        index index.html;
+
+        auth_basic "Access restricted";
+        auth_basic_user_file /etc/nginx/password.conf;
+
+        location /health {
+          return 200;
+        }
+
+        location / {
+          root /usr/share/nginx/html;
+          index index.html index.htm;
+        }
+
+      }
+
+      server {
+        listen 443 ssl;
+        listen [::]:443 ssl;
+        server_name www.hadoop.local;
+        ssl_certificate     /etc/nginx/ssl/tls.crt;
+        ssl_certificate_key /etc/nginx/ssl/tls.key;
+        ssl_protocols       TLSv1 TLSv1.1 TLSv1.2;
+        ssl_ciphers         HIGH:!aNULL:!MD5;
+
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+
+        proxy_cache_revalidate on;
+        proxy_cache_use_stale error timeout http_500 http_502 http_503 http_504;
+        proxy_cache_background_update on;
+        proxy_cache_lock on;
+
+        resolver kube-dns.kube-system.svc.cluster.local valid=5s;
+
+        auth_basic "Access restricted";
+        auth_basic_user_file /etc/nginx/password.conf;
+
+        location / {
+          proxy_pass http://localhost:9870/;
+          proxy_redirect default;
+        }
+      }
+    }
+  password.conf: |
+    student1:$apr1$vkkQyFui$ntgh7QAcWoci84KV79uKe0
+  index.html: |
+    <html>
+    <body>
+    <p>Some secrets:</p>
+    <ul>
+    <li><pre>username: .Data.username </pre></li>
+    <li><pre>password: .Data.password </pre></li>
+    <li><a href='/hadoop'>Hadoop</a></li>
+    </ul>
+    </body>
+    </html>
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: confhadoop
+data:
+  CORE_CONF_fs_defaultFS: "hdfs://localhost:9000"
+  CORE_CONF_hadoop_http_staticuser_user: "root"
+  CORE_CONF_hadoop_proxyuser_hue_hosts: "*"
+  CORE_CONF_hadoop_proxyuser_hue_groups: "*"
+  CORE_CONF_io_compression_codecs: "org.apache.hadoop.io.compress.SnappyCodec"
+
+  HDFS_CONF_dfs_webhdfs_enabled: "true"
+  HDFS_CONF_dfs_permissions_enabled: "false"
+  HDFS_CONF_dfs_namenode_datanode_registration_ip___hostname___check: "false"
+
+  YARN_CONF_yarn_log___aggregation___enable: "true"
+  YARN_CONF_yarn_log_server_url: "http://localhost:8188/applicationhistory/logs/"
+  YARN_CONF_yarn_resourcemanager_recovery_enabled: "true"
+  YARN_CONF_yarn_resourcemanager_store_class: "org.apache.hadoop.yarn.server.resourcemanager.recovery.FileSystemRMStateStore"
+  YARN_CONF_yarn_resourcemanager_scheduler_class: "org.apache.hadoop.yarn.server.resourcemanager.scheduler.capacity.CapacityScheduler"
+  YARN_CONF_yarn_scheduler_capacity_root_default_maximum___allocation___mb: "8192"
+  YARN_CONF_yarn_scheduler_capacity_root_default_maximum___allocation___vcores: "4"
+  YARN_CONF_yarn_resourcemanager_fs_state___store_uri: "/rmstate"
+  YARN_CONF_yarn_resourcemanager_system___metrics___publisher_enabled: "true"
+  YARN_CONF_yarn_resourcemanager_hostname: "localhost"
+  YARN_CONF_yarn_resourcemanager_address: "localhost:8032"
+  YARN_CONF_yarn_resourcemanager_scheduler_address: "localhost:8030"
+  YARN_CONF_yarn_resourcemanager_resource__tracker_address: "localhost:8031"
+  YARN_CONF_yarn_timeline___service_enabled: "true"
+  YARN_CONF_yarn_timeline___service_generic___application___history_enabled: "true"
+  YARN_CONF_yarn_timeline___service_hostname: "localhost"
+  YARN_CONF_mapreduce_map_output_compress: "true"
+  YARN_CONF_mapred_map_output_compress_codec: "org.apache.hadoop.io.compress.SnappyCodec"
+  YARN_CONF_yarn_nodemanager_resource_memory___mb: "16384"
+  YARN_CONF_yarn_nodemanager_resource_cpu___vcores: "8"
+  YARN_CONF_yarn_nodemanager_disk___health___checker_max___disk___utilization___per___disk___percentage: "98.5"
+  YARN_CONF_yarn_nodemanager_remote___app___log___dir: "/app-logs"
+  YARN_CONF_yarn_nodemanager_aux___services: "mapreduce_shuffle"
+
+  MAPRED_CONF_mapreduce_framework_name: "yarn"
+  MAPRED_CONF_mapred_child_java_opts: "-Xmx4096m"
+  MAPRED_CONF_mapreduce_map_memory_mb: "4096"
+  MAPRED_CONF_mapreduce_reduce_memory_mb: "8192"
+  MAPRED_CONF_mapreduce_map_java_opts: "-Xmx3072m"
+  MAPRED_CONF_mapreduce_reduce_java_opts: "-Xmx6144m"
+  MAPRED_CONF_yarn_app_mapreduce_am_env: "HADOOP_MAPRED_HOME=/opt/hadoop-3.2.1/"
+  MAPRED_CONF_mapreduce_map_env: "HADOOP_MAPRED_HOME=/opt/hadoop-3.2.1/"
+  MAPRED_CONF_mapreduce_reduce_env: "HADOOP_MAPRED_HOME=/opt/hadoop-3.2.1/"
+---
