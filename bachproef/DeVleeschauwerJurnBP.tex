@@ -45,6 +45,13 @@
     texcl=false,
 }
 
+\lstset{
+    language=yaml
+    basicstyle=\ttfamily,
+    columns=fullflexible,
+    frame=single,
+    breaklines=true
+}
 % Other packages not already included can be imported here
 
 %%---------- Document metadata -------------------------------------------------
@@ -158,6 +165,10 @@ Het onderwerp van deze bachelorproef is gebaseerd op een onderzoeksvoorstel dat 
 
 % Verwijzing naar het bestand met de inhoud van het onderzoeksvoorstel
 \input{../voorstel/voorstel-inhoud}
+
+\chapter{Docker compose}
+
+\input{docker-compose.yaml}
 
 %%---------- Andere bijlagen --------------------------------------------------
 % TODO: Voeg hier eventuele andere bijlagen toe. Bv. als je deze BP voor de

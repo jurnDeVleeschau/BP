@@ -6,13 +6,7 @@
 \label{ch:methodologie}
 
 
-\lstset{
-    language=yaml
-    basicstyle=\ttfamily,
-    columns=fullflexible,
-    frame=single,
-    breaklines=true
-}
+
 %% TODO: Hoe ben je te werk gegaan? Verdeel je onderzoek in grote fasen, en
 %% licht in elke fase toe welke stappen je gevolgd hebt. Verantwoord waarom je
 %% op deze manier te werk gegaan bent. Je moet kunnen aantonen dat je de best
@@ -29,17 +23,18 @@ Bij een typische installatie van deze oplossingen zou een cluster van elke oplos
 \newline
 De schaalbaarheid bij Spark bijvoorbeeld, is doordat het werk verdeeld wordt over meerdere Executors en er dus in een cluster eenvoudig extra Executors kunnen gebruikt worden. Zie ook volgende figuur.
 \newline
-\includegraphics[scale=0.7]{cluster-overview.png}
-\\
-(https://spark.apache.org/docs/latest/cluster-overview.html)
-\newline
+\begin{figure}
+    \includegraphics[scale=0.7]{cluster-overview.png}
+    \caption{TODO \autocite{Spark2023e}}
+\end{figure}
+
 Een van de onderdelen van Hadoop is YARN, een resource manager en job scheduler die instaat voor de verdeling van het werk over de verschillende cluster nodes en dus zorgt voor de schaalbaarheid.
 \newline
-\includegraphics[scale=0.7]{yarn_architecture.png}
-\\
-(https://hadoop.apache.org/docs/stable/hadoop-yarn/hadoop-yarn-site/YARN.html)
-\newline
-\newline
+\begin{figure}
+    \includegraphics[scale=0.7]{yarn_architecture.png}
+    \caption{TODO \autocite{Hadoop2023d}}
+\end{figure}
+
 Merk op dat het bij real-world installaties van deze applicaties, het meestal de bedoeling is dat de Big Data oplossingen achterliggend gebruikt worden door eigen applicaties en dat gewone ``gebruikers'' op geen enkele manier rechtstreeks toegang krijgen tot bv. Hadoop of Spark.
 \newline
 Volgens \autocite{Hadoop2023} wordt in een standaard configuratie de Hadoop cluster eenvoudig beschermd door alle netwerk toegang te beperken. 
@@ -163,7 +158,7 @@ Een bijkomend voordeel van dit soort aanpak, elke student een eigen omgeving, is
 
 \section{Big data}
 
-Om meer vertrouwd te geraken met de Big Data oplossingen zijn deze eerst allemaal eens lokaal opgezet via Docker Compose configuraties. Zie Appendix [TODO].
+Om meer vertrouwd te geraken met de Big Data oplossingen zijn deze eerst allemaal eens lokaal opgezet via Docker Compose configuraties. Zie Appendix [Docker compose TODO].
 Daarbij is er vertrokken van voorbeelden die beschikbaar zijn op het Internet en voorbeelden uit de Big Data cursusoefeningen.
 \newline
 \newline
