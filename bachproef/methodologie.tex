@@ -25,14 +25,14 @@ De schaalbaarheid bij Spark bijvoorbeeld, is doordat het werk verdeeld wordt ove
 \newline
 \begin{figure}
     \includegraphics[scale=0.7]{cluster-overview.png}
-    \caption{TODO \autocite{Spark2023e}}
+    \caption{Spark Worker Nodes \autocite{Spark2023e}}
 \end{figure}
 
 Een van de onderdelen van Hadoop is YARN, een resource manager en job scheduler die instaat voor de verdeling van het werk over de verschillende cluster nodes en dus zorgt voor de schaalbaarheid.
 \newline
 \begin{figure}
     \includegraphics[scale=0.7]{yarn_architecture.png}
-    \caption{TODO \autocite{Hadoop2023d}}
+    \caption{Hadoop YARN nodes en containers\autocite{Hadoop2023d}}
 \end{figure}
 
 Merk op dat het bij real-world installaties van deze applicaties, het meestal de bedoeling is dat de Big Data oplossingen achterliggend gebruikt worden door eigen applicaties en dat gewone ``gebruikers'' op geen enkele manier rechtstreeks toegang krijgen tot bv. Hadoop of Spark.
@@ -58,10 +58,10 @@ Volgens \textcite{Hadoop2023b} ondersteunt HDFS het gebruik van READ, WRITE en E
 Op die manier kunnen dan permissies toegekend worden aan de eigenaar, aan de groep en aan alle gebruikers. Dit is typisch ook de manier waarop permissies in Linux systemen functioneren.
 \newline
 Voor gebruikers van Linux komt ook de syntax voor het beheer van de permissies komt bekend voor:
-TODO
+\begin{lstlisting}
 hdfs dfs –chmod -R go+w <file/dir>
-
-
+\end{lstlisting}
+TODO
 Voorwaarde voor de toepassing van deze permissies is dat de gebruiker is gekend, geauthentificeerd door Kerberos, en dat de groepen waartoe de gebruiker behoort gekend zijn. Voor dit laatste doet HDFS volgens \textcite{Hadoop2023c} een beroep op bijvoorbeeld het Operating Systeem of een LDAP server.
 
 
@@ -121,17 +121,17 @@ De installatie van zowel de gedeelde cluster als de aparte omgeving kan geautoma
 \newline
 We zien een aantal mogelijke redenen om te kiezen voor een gedeelde Big Data cluster: reden 1 is gedeelde data, reden 2 is optimaal gebruik van resources en reden 3 is de enkelvoudige installatie t.o.v. een installatie voor elke student.
 
-\subsubsection{Gedeelde data}
+\paragraph{Gedeelde data}
 Dit is hier niet van toepassing, de data is enerzijds niet van die omvang dat ze niet kan gedupliceerd worden voor elke student en daarnaast is het ook niet de bedoeling dat de studenten dezelfde data kunnen wijzigen.
 
-\subsubsection{Optimaal gebruik van resources}
+\paragraph{Optimaal gebruik van resources}
 Hét argument voor optimaal gebruik van resources is dat nodes in een cluster gedeeld worden door alle gebruikers en ter beschikking staan voor het uitvoeren van bewerkingen naargelang de vraag, die niet doorlopend dezelfde is. Op die manier kan aan de afwisselende vraag van de gebruikers worden voldaan door een beperkter aantal nodes dan indien ze vastgelegd zouden zijn per applicatie, en dus gedurende bepaalde ongebruikt zijn.
 \newline
 In het geval van de studenten is dit niet van toepassing want juist tijdens de oefeningen en het examen wordt er op intensieve manier gebruikt gemaakt van de Big Data cluster en zal een gedeelde cluster voortdurend op piekvermogen moeten draaien.
 \newline
 Merk op dat het wel waarschijnlijk is dat de installatie van één enkele gedeelde cluster minder resources zal gebruiken dan de aparte omgevingen per student.
 
-\subsubsection{Enkelvoudige installatie}
+\paragraph{Enkelvoudige installatie}
 Het achterliggende idee van gebruik van containertechnologie is dat het eenvoudig is om een container op te starten, te verplaatsen, bijkomende containers te starten, enz. Dit alles gebaseerd op een set Docker images in combinatie met configuratie files.
 \newline
 Het werk kruipt dus eerder in dit alles opzetten, en is grotendeels onafhankelijk van hoeveel keer het daarna geïnstalleerd moet worden.
@@ -425,41 +425,23 @@ Dit kan opgezet worden in een ConfigMap, dit is nog niet gebeurd door tijdsgebre
 \newline
 
 \begin{figure}
-    \includegraphics[scale=0.4]{Hadoop 2 pods resource usage size.png}
-    \caption{TODO}
+    \includegraphics[scale=0.4]{Hadoop resource usage.png}
+    \caption{Resources gebruik - 1 omgeving met Hadoop}
 \end{figure}
 
 \begin{figure}
     \includegraphics[scale=0.4]{Hadoop 2 pods resource usage.png}
-    \caption{TODO}
-\end{figure}
-
-\begin{figure}
-    \includegraphics[scale=0.4]{Hadoop and Spark resource usage size.png}
-    \caption{TODO}
+    \caption{Resources gebruik - 2 omgevingen met Hadoop}
 \end{figure}
 
 \begin{figure}
     \includegraphics[scale=0.4]{Hadoop and Spark resource usage.png}
-    \caption{TODO}
-\end{figure}
-
-\begin{figure}
-    \includegraphics[scale=0.4]{Hadoop resource usage size.png}
-    \caption{TODO}
-\end{figure}
-
-\begin{figure}
-    \includegraphics[scale=0.4]{Hadoop resource usage.png}
-    \caption{TODO}
-\end{figure}
-
-\begin{figure}
-    \includegraphics[scale=0.4]{Kafka resource usage size.png}
-    \caption{TODO}
+    \caption{Resources gebruik - 1 omgeving met Hadoop en Spark}
 \end{figure}
 
 \begin{figure}
     \includegraphics[scale=0.4]{Kafka resource usage.png}
-    \caption{TODO}
+    \caption{Resources gebruik - 1 omgeving met Kafka}
 \end{figure}
+
+
