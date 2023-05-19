@@ -44,8 +44,8 @@
 
 \chapter*{\IfLanguageName{dutch}{Samenvatting}{Abstract}}
 
-In het kader van de opleiding Toegepaste Informatica HoGent worden de Big Data frameworks Hadoop, Spark en Kafka lokaal op de laptop van de student geïnstalleerd voor de oefeningen.
-De doelstelling van deze studie is uit te zoeken of containertechnologie kan gebruikt worden om die gecombineerde installaties van Big Data frameworks te automatiseren, met een focus op efficiënt gebruik van resources, security en stabiliteit, schaalbaarheid en logging. De bedoeling is dat de resultaten van dit onderzoek in de volgende jaren kunnen gebruikt worden om de lessen van het vak ``Big Data Processing'' te faciliteren.
+In het kader van de opleiding Toegepaste Informatica HOGENT worden de Big Data frameworks Hadoop, Spark en Kafka lokaal op de laptop van de student geïnstalleerd voor de oefeningen.
+De doelstelling van deze bachelorproef is uit te zoeken of containertechnologie kan gebruikt worden om die gecombineerde installaties van Big Data frameworks te automatiseren, met een focus op efficiënt gebruik van resources, security en stabiliteit, schaalbaarheid en logging. De bedoeling is dat de resultaten van dit onderzoek in de volgende jaren kunnen gebruikt worden om de lessen van het vak ``Big Data Processing'' te faciliteren.
 \newline
 \newline
 Hiervoor werden de installatie en configuratie van deze frameworks bestudeerd om tot een werkende oplossing te komen, daarbij werden Docker (Compose) en Kubernetes bekeken, die kunnen gebruikt worden om de software centraal te installeren, en niet langer op de laptop van de student.
@@ -63,7 +63,7 @@ Om tot een oplossing te komen die op het VIC kan geïnstalleerd worden kwam ik a
 Uit de testen die ik deed blijkt dat het zeker mogelijk is om alle installaties te doen op een Kubernetes omgeving, dus ook op het VIC. In grote lijnen zijn er 2 manieren, namelijk een gedeelde omgeving voor alle studenten waarbij de aspecten veiligheid en stabiliteit eerder complex te configureren zijn, en waarvoor er in de praktijk meestal bijkomende oplossingen gebruikt worden, en een geïsoleerde omgeving voor elke student waarbij er automatisch isolatie en stabiliteit is, maar waarbij er nog steeds afscherming/veiligheid moet opgezet worden.
 Bij een gedeelde omgeving draait elke Big Data oplossing in een eigen cluster met communicatie tussen de eigen Pods, en is er nog eens communicatie tussen de clusters. Dit opzetten is dus veel meer configuratie dan de geïsoleerde omgeving.
 \newline
-Voor deze reden, en nog andere die verder in detail worden besproken, is mijn conclusie dat de eenvoudigste oplossing voor installatie van de Big Data frameworks op het VIC een geïsoleerde omgeving voor elke student is.
+Om deze reden, en nog andere die verder in detail worden besproken, is de conclusie dat de eenvoudigste oplossing voor installatie van de Big Data frameworks op het VIC een geïsoleerde omgeving voor elke student is.
 \newline
 \newline
 Als laatste opmerking wou ik er nog op wijzen dat er tijdens de lessen gebruikt gemaakt wordt van het feit dat de applicaties lokaal draaien in Docker, er wordt o.a. Docker exec gebruikt om toegang te hebben tot een lokale Hadoop container en command omgeving om van daaruit Hadoop te beheren. Dit is niet beschikbaar eens de applicaties in de cloud (VIC) draaien. Hiervoor moet nog een oplossing bedacht worden, eventueel toch nog 1 enkele Docker container lokaal als Hadoop client, of een SSH container toevoegen aan elke student omgeving.
