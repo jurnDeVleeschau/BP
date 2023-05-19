@@ -61,7 +61,7 @@ Voor gebruikers van Linux komt ook de syntax voor het beheer van de permissies k
 TODO
 hdfs dfs –chmod -R go+w <file/dir>
 
-\newline
+
 Voorwaarde voor de toepassing van deze permissies is dat de gebruiker is gekend, geauthentificeerd door Kerberos, en dat de groepen waartoe de gebruiker behoort gekend zijn. Voor dit laatste doet HDFS volgens \textcite{Hadoop2023c} een beroep op bijvoorbeeld het Operating Systeem of een LDAP server.
 
 
@@ -88,9 +88,6 @@ Volgens \textcite{Maarek2018} ondersteunt Kafka meerdere beveiligingsmechanismes
     \item Authorizatie laat toe om de permissies te definiëren die bepalen of een bepaalde geïdentificeerde gebruiker (applicatie) toegang krijgt tot bepaalde topics om te lezen of the schrijven.
 \end{itemize}
 
-
-\newline
-\newline
 Gebruikers afschermen van elkaar in een opstelling van Hadoop en Spark, beiden in clusters wordt snel zeer ingewikkeld. Elk van de oplossingen bestaat uit meerdere processen die met elkaar communiceren en ieder onderdeel moet secure opgezet worden zodat gebruikers niet, bewust of per ongeluk, data van elkaar te zien krijgen. We spreken hier over encryptie voor de opslag, authenticatie en encryptie bij communicatie tussen de verschillende processen, authenticatie voor de gebruiker op Hadoop, authenticatie voor de gebruiker op Spark enz.
 De manier van beveiligen is voor elk van deze oplossingen en interne processen op een andere manier, en vraagt om bijkomende softwares zoals LDAP, Kerberos server, enz.
 
@@ -100,7 +97,7 @@ Voor Kafka is de SASL/PLAINTEXT beveiliging zeker voldoende in ons geval en ook 
 Elk van de Big Data oplossingen, en Kubernetes, ondersteunen mechanismes om applicaties te verdelen over de pods en van elkaar af te schermen, bij bepaalde onderdelen kunnen er limieten gezet worden op CPU en geheugen gebruik. Deze configuraties zijn gekoppeld aan nodes, containers en applicaties. De achterliggende bedoeling is vooral om de eigen gebouwde applicaties te ondersteunen en vlot te laten beroep doen op de Big Data functionaliteiten. De focus van deze mechanismes, dikwijls gebaseerd op een voorkennis van het soort verwerken dat in de cluster zal gebeuren, ligt minder op rechtstreeks gebruik van de oplossingen door gebruikers die applicaties aan het ontwikkelen zijn.
 \newline
 \newline
-In \texcite{Deane2019} wordt hier dieper op ingegaan en wordt gesproken over het ``lawaaierige buurman probleem''. Het legt uit dat hoe meer gebruikers er komen in de cluster, hoe moeilijker het wordt om ervoor te zorgen dat deze gebruikers geen last van elkaar ondervinden. Daartoe passen beheerders allerlei technieken toe zoals YARN resource pools, prioriteiten stellen, specifieke nodes toewijzen aan applicaties, enz. Een aantal van deze technieken zijn ook niet toepasbaar in ons geval want alle ontwikkelaars moeten gelijk behandeld worden, dus prioriteiten zetten is niet haalbaar, en specifiek werk opslitsen op specifieke nodes is ook niet mogelijk tenzij dan door alle ontwikkelaars aparte nodes te geven.
+In \textcite{Deane2019} wordt hier dieper op ingegaan en wordt gesproken over het ``lawaaierige buurman probleem''. Het legt uit dat hoe meer gebruikers er komen in de cluster, hoe moeilijker het wordt om ervoor te zorgen dat deze gebruikers geen last van elkaar ondervinden. Daartoe passen beheerders allerlei technieken toe zoals YARN resource pools, prioriteiten stellen, specifieke nodes toewijzen aan applicaties, enz. Een aantal van deze technieken zijn ook niet toepasbaar in ons geval want alle ontwikkelaars moeten gelijk behandeld worden, dus prioriteiten zetten is niet haalbaar, en specifiek werk opslitsen op specifieke nodes is ook niet mogelijk tenzij dan door alle ontwikkelaars aparte nodes te geven.
 De oplossing die volgens https://blog.cloudera.com/improving-multi-tenancy-with-virtual-private-clusters/ dan typisch gebeurt is opslitsen van de cluster in kleinere clusters. Gezien het hier meestal gaat over dezelfde data van een bedrijf bevat elke cluster dan een duplicaat en hierop gaat het artikel dan verder en stelt een soort tussenmodel voor, waarbij de HDFS data op een gedeelde cluster blijft en de MapReduce en Spark verwerking op aparte clusters gebeurt.
 \newline
 Aangezien het in ons geval gaat om het gebruik van de cluster door minder ervaren ontwikkelaars, is de kans op ``lawaaierige buren'' groot.
@@ -141,7 +138,6 @@ Het werk kruipt dus eerder in dit alles opzetten, en is grotendeels onafhankelij
 Een gedeelde cluster zal complexer zijn om op te zetten door de security en stabiliteitsvereisten.
 \newline
 Zoals ook aangehaald in het vorige stuk over stabiliteit, zal er altijd het risico blijven dat de studenten niet 100\% afgeschermd zijn van elkaar en van onbetrouwbare applicaties.
-
 \newline
 Gebaseerd op het voorgaande lijkt het ons dus beter, en eenvoudiger, is om elke student een eigen omgeving te geven, volledig afgeschermd van de andere, door aparte containers te gebruiken per student.
 \newline
