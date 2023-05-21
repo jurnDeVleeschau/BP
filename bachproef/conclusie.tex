@@ -5,7 +5,7 @@
 \chapter{Conclusie}%
 \label{ch:conclusie}
 
-% TODO: Trek een duidelijke conclusie, in de vorm van een antwoord op de
+% TO DO: Trek een duidelijke conclusie, in de vorm van een antwoord op de
 % onderzoeksvra(a)g(en). Wat was jouw bijdrage aan het onderzoeksdomein en
 % hoe biedt dit meerwaarde aan het vakgebied/doelgroep? 
 % Reflecteer kritisch over het resultaat. In Engelse teksten wordt deze sectie
@@ -14,29 +14,27 @@
 % Heeft het onderzoek geleid tot nieuwe vragen die uitnodigen tot verder 
 %onderzoek?
 
-TODO. Dit is een kopie van de samenvatting. Nog te herschrijven en uit te werken.
+Het uitgangspunt van deze bachelorproef was om te onderzoeken of we tot een oplossing konden komen voor de installatie van Hadoop, Spark en Kafka op basis van containertechnologie, met extra aandacht voor security en stabiliteit, ter ondersteuning van de oefeningen en examens aan HOGENT.
+\newline
+De mogelijke containertechnologieën waren onder andere Docker en Kubernetes.
+\newline
+\newline
+Het zijn de aandachtspunten security en stabiliteit, en het mogelijke gebruik van Kubernetes, die ons in de richting van gescheiden omgevingen hebben geleidt. Gezien de mogelijke complexiteit van het opzetten van de Big Data oplossingen in een gedeelde cluster hoopten we op die manier ook een aantal zaken te kunnen vereenvoudigen om binnen de beperkte tijd van de bachelorproef een haalbare configuratie te bedenken en realiseren.
+\newline
+\newline
+Door gebruik te maken van een lokale Docker Desktop en Kubernetes omgeving hebben we aangetoond dat containertechnologie een mogelijke en interessante piste is voor dit soort installaties.
+\newline
+Uiteindelijk bleek wel dat deze oplossing te veeleisend is voor de beschikbare resources op het VIC. De aanpak die we voor ogen hadden, en die we uitgewerkt hebben, zou eerder geschikt zijn voor een publieke cloud omgeving waar je zo goed als ongelimiteerd nodes kunt starten en stoppen, naargelang je behoeften, en waar er geen resources gebruikt worden (en er dus ook geen kosten zijn) op momenten dat de nodes niet nodig zijn en uit staan.
+\newline
+\newline
+Voor installatie op het VIC moet er dus verder onderzoek gebeuren en rekening houdende met het feit dat er nog geen Kubernetes is geïnstalleerd en dat Docker Swarm eenvoudiger zou moeten zijn in gebruik en dat het minder resources gebruikt dan Kubernetes is dat de voor de hand liggende optie.
+\newline
+De oplossing zou dan een gedeelde cluster zijn, en voor het security aspect moet in eerste instantie best gekeken worden naar Apache Ranger.
+\newline
+Onze grootste zorg bij een gedeelde cluster blijft het risico, zoals eerder vermeld, op de ``lawaaierige buur'', hiervoor hebben we volgende ideeën:
+\newline
+\begin{itemize}
+    \item Voldoende testen voorzien om de invloed van een zeer belastende query of programma op de andere gebruikers te meten.
+    \item Aangezien de verwerking vooral in Spark worker nodes gebeurt, het eenvoudig maken om snel extra nodes te kunnen toevoegen.
+\end{itemize}
 
-In het kader van de opleiding Toegepaste Informatica HOGENT worden de Big Data frameworks Hadoop, Spark en Kafka lokaal op de laptop van de student geïnstalleerd voor de oefeningen.
-De doelstelling van deze studie was uit te zoeken of containertechnologie kan gebruikt worden om die gecombineerde installaties van Big Data frameworks te automatiseren, met een focus op efficiënt gebruik van resources, security en stabiliteit, schaalbaarheid en logging. De bedoeling is dat de resultaten van dit onderzoek in de volgende jaren kunnen gebruikt worden om de lessen van het vak ``Big Data Processing'' te faciliteren.
-\newline
-\newline
-Hiervoor werden de installatie en configuratie van deze frameworks bestudeerd om tot een werkende oplossing te komen, daarbij werden Docker (Compose) en Kubernetes bekeken, die kunnen gebruikt worden om de software centraal te installeren, en niet langer op de laptop van de student.
-\newline
-\newline
-Tijdens het onderzoek bleek al snel dat de 3 Big Data oplossingen zeer verschillend zijn en dus voor alle vereisten telkens een andere aanpak en oplossing nodig is.
-Het zijn ook geen eenvoudige applikaties, en er zijn weinig of geen relevante tutorials of Blog artikels over te vinden wat dus betekent dat ik telkens de volledige handleidingen moest doorspitten op zoek naar antwoorden. Ook ontmoedigend was het feit dat er regelmatig gesteld werd dat je al goede kennis en ervaring moest hebben van een onderdeel alvorens eraan te beginnen. Bijvoorbeeld security en Kerberos.
-\newline
-Er moesten dus keuzes gemaakt worden om binnen de beperkte tijd van de bachelorproef haalbare configuraties te bedenken en realiseren.
-\newline
-\newline
-Om tot een oplossing te komen die op het VIC kan geïnstalleerd worden kwam ik al snel te weten dat Kubernetes de enige mogelijkheid met toekomst is, want Docker Compose en Docker Swarm worden niet langer ondersteund in de laatste versies van VMWare vSphere.
-\newline
-\newline
-Uit de testen die ik deed blijkt dat het zeker mogelijk is om alle installaties te doen op een Kubernetes omgeving, dus ook op het VIC. In grote lijnen zijn er 2 manieren, namelijk een gedeelde omgeving voor alle studenten waarbij de aspecten veiligheid en stabiliteit eerder complex te configureren zijn, en waarvoor er in de praktijk meestal bijkomende oplossingen gebruikt worden, en een geïsoleerde omgeving voor elke student waarbij er automatisch isolatie en stabiliteit is, maar waarbij er nog steeds afscherming/veiligheid moet opgezet worden.
-Bij een gedeelde omgeving draait elke Big Data oplossing in een eigen cluster met communicatie tussen de eigen Pods, en is er nog eens communicatie tussen de clusters. Dit opzetten is dus veel meer configuratie dan de geïsoleerde omgeving.
-\newline
-Voor deze reden, en nog andere die verder in detail worden besproken, is mijn conclusie dat de eenvoudigste oplossing voor installatie van de Big Data frameworks op het VIC een geïsoleerde omgeving voor elke student is.
-\newline
-\newline
-Als laatste opmerking wou ik er nog op wijzen dat er tijdens de lessen gebruikt gemaakt wordt van het feit dat de applikaties lokaal draaien in Docker, er wordt o.a. Docker exec gebruikt om toegang te hebben tot een lokale Hadoop container en command omgeving om van daaruit Hadoop te beheren. Dit is niet beschikbaar eens de applikaties in de cloud (VIC) draaien. Hiervoor moet nog een oplossing bedacht worden, eventueel toch nog 1 enkele Docker container lokaal als Hadoop client, of een SSH container toevoegen aan elke student omgeving.
-\newline

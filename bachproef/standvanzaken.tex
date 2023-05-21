@@ -39,19 +39,19 @@ Merk op dat de machine waarbinnen de containers draaien zowel een fysieke als ee
 \newline
 LXC draait enkel op Linux en biedt een container die in essentie een blanco Linux omgeving is, waarbinnen dan 1 of meerdere applicaties worden geïnstalleerd. Als Linux omgeving is er zeer veel flexibiliteit maar daaraan gekoppeld ook meer complexiteit.
 \newline
-Docker heeft aan containers een aantal functionaliteiten toegevoegd zoals abstractie van opslag en netwerk, en het concept van 'image', dat toelaat om een Docker container eenvoudig op te zetten gebaseerd op voorgedefinieerde images, is beter ondersteund en effiënter qua disk space.
+Docker heeft aan containers een aantal functionaliteiten toegevoegd zoals abstractie van opslag en netwerk, en het concept van 'image' dat beter is ondersteund en effiënter qua disk space. Een image bevat al het nodige om een applicatie te kunnen draaien (code, ondersteunende software bijvoorbeeld Java Virtual Machine, scripts, configuratie), dit laat toe om een Docker container eenvoudig op te zetten gebaseerd op voorgedefinieerde images.
 \newline
 Een essentieel verschil met LXC containers is dat Docker containers 'single-process' zijn. Dit betekent dat ze 1 enkel process draaien. Vandaar ook de typische aanpak van Docker images waarbij elk image 1 enkele applicatie bevat, inclusief de ondersteunende software en de bijhorende configuratie. Dat maakt dat een Docker image telkens gelinkt is aan 1 oplossing.
 \newline
-\begin{figure}
+\begin{figure}[H]
     \includegraphics[scale=0.8]{LXC vs Docker.png}
     \caption{Het verschil tussen LXC en Docker containers\autocite{Kahuha2023}}
 \end{figure}
-\newline
-\newline
+
 Uitgevers van software, zowel Open Source als commerciële software, stellen dikwijls hun oplossing ook ter beschikking op DockerHub als image, en aangezien iedereen toegang kan krijgen tot DockerHub, binnen bepaalde limieten afhankelijk van het gratis of betalende abonnement, worden Open Source images ook door derden toegevoegd.
 \newline
-Voor developers is het voordeel dat ze snel een lokale omgeving kunnen opstaren, van een bepaalde versie van een oplossing, bijvoorbeeld MySQL, nginx, ...
+Voor developers is het voordeel dat ze snel een lokale omgeving kunnen opstaren, van een bepaalde versie van een oplossing, bijvoorbeeld MySQL, nginx, enz. Voor het ene project is MySQL versie 5.x nodig, voor een ander project MySQL 8.x, hiervoor moet de development omgeving niet telkens gewijzigd worden, per project wordt de ondersteunende software via containers gestart.
+\newline
 Als onderdeel van een CI/CD pipeline worden images gebouwd en daarna van Test naar Acceptatie naar Productie omgeving gebracht, hetzelfde ongewijzigde image dus minder kans op fouten tijdens installatie. Bij containers gebeurt de bouw van de image geautomatiseerd 1 keer. Daarna is het de image die alle omgevingen doorloopt.
 \newline
 In grootschalige cloud-omgevingen is het voordeel van image gebaseerde containers dat bijkomende containers opstarten veel eenvoudiger is. Hiervoor zijn intussen ook al oplossingen gegroeid zoals Kubernets zie verder.
@@ -62,7 +62,7 @@ In de eerste versies maakte Docker gebruik van LXC, voor de virtualisatie functi
 
 Voor een nog meer gedetailleerde vergelijking verwijzen we naar \textcite{Tunggal2023}
 
-\subsubsection{Docker Image}
+\subsubsection{Docker Image opbouw en structuur}
 Docker images gebruiken een `parent` image, bijvoorbeeld een basis Linux container image, waaraan dan op basis van de Dockerfile (een tekst file met opeenvolgende commandos) software wordt toegevoegd. De nieuwe image verwijst naar de parent image, maar bevat deze niet. Er wordt een `laag` aangemaakt die dan samen met de parent image kan uitgevoerd worden. Samen vormen ze de nieuwe image.
 Deze kan op zijn beurt gebruikt worden als parent voor een andere image, die dan al uit 3 image lagen zal bestaan. Dit vormt een besparing op disk space en netwerk communicatie, want de images worden typisch centraal opgeslagen op DockerHub zodat ze door anderen kunnen gebruikt worden.
 Merk op dat dit betekent dat de inhoud van deze image layers niet kan gewijzigd worden, anders zou de container met Image A gebaseerd op Image X de inhoud wijzigen van Image B ook gebaseerd op Image X. 
@@ -76,7 +76,7 @@ Bijvoorbeeld voor een database container worden de databases zelf in een vast vo
 Volgens \textcite{Docker2023} is Docker Compose een onderdeel van de Docker software dat helpt om combinaties van Docker containers samen te gebruiken. De basis vormt een Docker Compose file (yaml formaat) waarin verschillende containers (services genaamd in Docker Compose terminologie) worden gedefinieerd. Elke service is gebaseerd op een Docker image, per service kunnen er volumes toegevoegd worden, netwerken opgezet die toelaten aan de verschillende containers om te communiceren, dependencies tussen services (welke eerst moet gestart worden), parameters die bepalen wanneer een container moet herstart worden, enz.
 \newline
 \newline
-De meeste van die zaken zijn allemaal ook manueel te verwezenlijken met meerdere opeenvolgende Docker commando's maar het voordeel van Docker Compose is dat het toelaat dit op een declaratieve manier vast te leggen in één file en met één enkel docker compose commando wordt de combinatie van services opgestart.
+De meeste van die zaken zijn allemaal ook manueel te verwezenlijken met meerdere opeenvolgende Docker commando's maar het voordeel van Docker Compose is dat het toelaat dit op een declaratieve manier vast te leggen in één file en met één enkel docker compose commando wordt de combinatie van services opgestart. De Docker compose file kan ook makkelijk gedeeld en herbruikt worden, met beperkte aanpassingen versies wijzigen, het geheel van de container samenhang zit in 1 file.
 \newline
 \newline
 
@@ -181,12 +181,11 @@ De Data die verwerkt moet worden, doorloopt de volgende fases die telkens in par
 \end{itemize}
 
 De volgende figuur verduidelijkt de werking van MapReduce met een voorbeeld van verwerken van tekst, waarbij de woordfrequentie wordt berekend door de data eerst te splitsen en uiteindelijk terug samen te voegen, en in de fases van Mapping en Reducing wordt  het werk uitgevoerd door meerdere onafhankelijke processen.
-\begin{figure}
+\begin{figure}[H]
     \includegraphics[scale=0.9]{map-reduce.png}
-    \caption{TODO \autocite{Anushkakhatri2022}}
+    \caption{Diagram ter verduidelijking van MapReduce \autocite{Anushkakhatri2022}}
 \end{figure}
-\\
-\\
+
 Hadoop ondersteunt het gebruik van MapReduce programmas geschreven in programmeertalen zoals Java, Python, Ruby en C++.
 \autocite{Taylor2023}
 \newline
@@ -195,7 +194,7 @@ Hadoop wordt o.a. alleenstaand gebruikt tijdens de oefeningen Big Data Processin
 In de eenvoudigste vorm is er 1 docker compose file die alle services opstart om te kunnen werken met 1 master en 1 slave.
 \newline
 \newline
-Elke service (namenode, datanode, resourcemanager) is een specifiek Docker image, ook beschikbaar op DockerHub. Er zijn voorbeelden te vinden van de Docker scripts die gebruikt werden om dit soort images te bouwen. Typisch is er een basis Hadoop image dat het volledige framework bevat, en worden daar aparte images vanaf geleid die telkens maar 1 specifiek process (namenode, datanode, ...) van Hadoop opstarten.
+Elke service (namenode, datanode, resourcemanager) is een specifiek Docker image, waarvan er voorbeelden te vinden zijn op DockerHub, en ook van de Docker scripts die gebruikt werden om de images op te bouwen. Typisch is er een basis Hadoop image dat het volledige framework bevat, en worden daar aparte images vanaf geleid die telkens maar 1 specifiek process (namenode, datanode, ...) van Hadoop opstarten.
 \newline
 Door op die manier met aparte images te werken kan het beheer van de cluster buiten Hadoop worden gedaan, bijvoorbeeld in Kubernetes of Docker Swarm.
 \newline
@@ -220,31 +219,26 @@ De SQL interface kan ook aangesproken worden via jdbc en odbc.
 (Volgens \textcite{Spark2023}, \textcite{Naveen2023}, \textcite{Spark2023a})
 
 \subsection{Spark MLlib}
-De Machine Learning Library (MLlib) van Apache Spark is ontworpen voor eenvoud en schaalbaarheid  en bestaat uit leeralgoritmen en hulpprogramma's, waaronder classificatie, regressie, clustering, collaboratieve filtering en onderliggende optimalisatie. Spark MLLib ondersteunt het trainen van modellen en daarop gebaseerde data voorspellingen, en integreert naadloos met de andere Spark-componenten. Het is beschikbaar voor meerdere programmeertalen waaronder Java, Scala en Python.
+De Machine Learning Library (MLlib) van Apache Spark is ontworpen voor eenvoud en schaalbaarheid  en bestaat uit leeralgoritmen en hulpprogramma's, waaronder classificatie, regressie, clustering, collaboratieve filtering en onderliggende optimalisatie. Spark MLLib ondersteunt het trainen van modellen en daarop gebaseerde data voorspellingen, en integreert met de andere Spark-componenten. Het is beschikbaar voor meerdere programmeertalen waaronder Java, Scala en Python.
 Spark MLlib biedt zowel een Dataframe API als eerste keus als een RDD API die intussen lijkt uitgefaseerd te worden.
-\autocite{Spark2023b}
+(Volgens \autocite{Spark2023b})
 
 \subsection{Spark GraphX}
-Volgens \autocite{TODO} is Spark GraphX een Spark API die toelaat om grafen op te bouwen, gebaseerd op achterliggende databronnen in Spark, en hierop dan parallelle verwerking en analyses te doen. 
-Een graaf is een data structuur die bestaat uit een verzameling objecten, knopen, en hun onderliggende relaties, verbindingen. Dit kun je duidelijk zien op figuur.
+Spark GraphX is een Spark API die toelaat om grafen op te bouwen, gebaseerd op achterliggende databronnen in Spark, en hierop dan parallelle verwerking en analyses te doen. 
+Een graaf is een data structuur die bestaat uit een verzameling objecten, knopen, en hun onderliggende relaties, verbindingen. Dit kun je duidelijk zien op figuur 2.3.
 \newline
 \newline
-\begin{figure}
+\begin{figure}[H]
     \includegraphics[scale=0.2]{GraphX-Example-Spark-GraphX-Tutorial-Edureka.png}
     \caption{Voorbeeld van een graaf\autocite{Dayananda2019}}
 \end{figure}
 
 
 \subsection{Spark Streaming / Structured Streaming}
-Many applications need the ability to process and analyze not only batch data, but also streams of new data in real-time. Running on top of Spark, Spark Streaming enables powerful interactive and analytical applications across both streaming and historical data, while inheriting Spark’s ease of use and fault tolerance characteristics. It readily integrates with a wide variety of popular data sources, including HDFS, Flume, Kafka, and Twitter.\autocite{Databricks2023}
+Volgens \autocite{Buuck2022} is Spark Streaming een uitbreiding van de Spark APIs, die toelaat de verwerking te doen van ``Live'' data, data streams genaamd. Intussen wordt het als legacy beschouwd en is het vervangen door ``Structured Streaming'' dat gelijkaardige functionaliteit biedt door gebruik te maken van de DataFrame APIs in plaats van de Streaming RDD APIs. Met als voordeel dat SQL beter ondersteund wordt in de DataFrame APIs.
 \newline
 \newline
-Spark Streaming ondersteunt dus het verwerken van data in real-time met typische MapReduce algoritmes. Intussen wordt het als legacy beschouwd en is het vervangen door ``Structured Streaming'' dat gelijkaardige functionaliteit biedt door gebruik te maken van de DataFrame APIs in plaats van de Streaming RDD APIs. Met als voordeel dat SQL beter ondersteund wordt in de DataFrame APIs.
-\autocite{Buuck2022}
-\newline
-\newline
-Het is dit laatste onderdeel, Spark Streaming, dat typisch in combinatie met Kafka (zie verder) wordt gebruikt om data van op te halen en na verwerking eventueel terug te bezorgen voor verdere stappen.
-\newline
+Het is dit laatste onderdeel van Spark, Structured Streaming, dat typisch in combinatie met Kafka (zie verder) wordt gebruikt om data op te halen en na verwerking terug te bezorgen voor eventuele verdere stappen.
 \newline
 \newline
 Terugkomend op ons doel van Spark in containers te draaien: er zijn Spark Docker images beschikbaar die toelaten zowel een Spark Master als een Spark Worker te starten.
@@ -252,7 +246,7 @@ Terugkomend op ons doel van Spark in containers te draaien: er zijn Spark Docker
 
 \section{Kafka}
 Volgens \textcite{AwsAmazon2023b} is Apache Kafka een Open Source gedistribueerd platform voor Event Streaming, waarbij binnenkomende boodschappen (events) continu worden opgeslagen en verwerkt. Het wordt gebruikt voor data-pijplijnen en data-integratie applicaties.
-Volgens \autocite{ASF2022b} is het schaalbaar tot duizenden Brokers, kan het billioenen boodschappen per dag aan en is het zeer fault-tolerant door de cluster-architectuur. Hieronder worden een aantal typische concepten van Apache Kafka besproken.
+Volgens \textcite{ASF2022b} is het schaalbaar tot duizenden Brokers, kan het billioenen boodschappen per dag aan en is het zeer fault-tolerant door de cluster-architectuur. Hieronder worden een aantal typische concepten van Apache Kafka besproken.
 
 \subsection{Kafka Broker}
 Volgens \textcite{GitBook2023} bestaat een Kafka cluster uit meerdere servers, en deze servers worden brokers genoemd. Brokers binnen een cluster praten rechtstreeks met elkaar en via Zookeeper (zie verder).
@@ -279,12 +273,6 @@ Een topic bestaat uit 1 of meerdere partities. Records worden in een partitie op
 Meerdere partities voor 1 enkel topic dienen ter ondersteuning van de schaalbaarheid, waarbij elke partitie wordt opgeslagen op een andere broker. Op die manier kunnen topics met zeer grote volumes aan records parallel opgeslagen en verwerkt worden.
 \newline
 \newline
-\begin{figure}
-    \includegraphics[scale=0.7]{partitions-example.png}
-    \caption{De verdeling van ons voorbeeld over 1 partitie (met sleutel) of 2 partities (zonder)}
-\end{figure}
-\newline
-\newline
 Volgens \textcite{Harbour2023} speelt de sleutel van een event een belangrijke rol bij partitions. Voor het verwerken van grote volumes aan events kunnen meerdere consumers opgezet worden die ieder de events van een enkele partitie verwerken. Die consumers krijgen de events van hun partitie in de juiste volgorde binnen, maar zien niet de events op de andere partities. Terugkerend naar ons voorbeeld uit de bankwereld:
 \begin{itemize}
     \item Producer stuurt een event dat 100 Euro op de rekening van Jan wordt gezet. Dit wordt op partitie 1 gezet.
@@ -292,6 +280,11 @@ Volgens \textcite{Harbour2023} speelt de sleutel van een event een belangrijke r
     \item Consumer X leest van de partitie 2 dat 50 Euro van de rekening van Jan wordt gehaald -> dit wordt geweigerd want er staat niet genoeg geld op.
     \item Consumer Y leest van de partitie 1 dat 100 Euro op de rekening van Jan wordt gezet -> dit wordt uitgevoerd.
 \end{itemize}
+
+\begin{figure}[H]
+    \includegraphics[scale=0.5]{partitions-example.png}
+    \caption{De verdeling van ons voorbeeld over 1 partitie (met sleutel) of 2 partities (zonder)}
+\end{figure}
 
 Om vorig scenario te vermijden worden events aan partities toegewezen op basis van de sleutel van het event. Het is dus aan de producer om de juiste sleutel te kiezen, in dit geval ``Jan'', om ervoor te zorgen dat beide events op dezelfde partitie komen en allebei in de juiste volgorde aan de consumer worden bezorgd.
 \newline
@@ -310,6 +303,17 @@ Bij Apache Kafka werd Zookeeper gebruikt voor metadata beheer, bijvoorbeeld bijh
 Afhankelijk van de versie van Kafka die we uiteindelijk zullen gebruiken kan Zookeeper wel of niet toegevoegd worden aan de oplossing.
 \newline
 \newline
+
+\section{Big Data software Docker images}
+Enkele van de Docker images die tijdens de cursus gebruikt worden zijn die van Big Data Europe. Dit is een project van de Europse Unie dat liep van 2015 tot 2017.
+Eén van de doelstellingen was ``Design, integrate and deploy a cloud-deployment-ready Big Data aggregator platform comprising key open-source Big Data technologies for real-time and batch processing, such as Hadoop, Cassandra and Storm.'' \textcite{Commission2022}, dus om het voor Europese instellingen en bedrijven eenvoudiger te maken om in te stappen in het gebruik van deze Big Data oplossingen.
+\newline
+Op dockerhub zijn de images terug te vinden onder de bde2020 gebruiker (https://hub.docker.com/u/bde2020). Op github (https://github.com/big-data-europe) zijn alle sources te vinden van ieder image.
+\newline
+De laatste images van Spark en Hadoop zijn van vorig jaar (3.3.0) en er zijn geen images beschikbaar voor de laatste versie van Spark (3.4.0). Het is niet duidelijk of dit project nog zeer actief is. In de toekomst zullen we de images dus mogelijks zelf moeten bouwen, waarbij wel een beroep kan gedaan worden op de bestaande sources, of kijken naar andere publishers.
+\newline
+Bitnami is een ``Verified Publisher'' op Dockerhub, die dus te vertrouwen is, die een onder andere een Spark image ter beschikking stelt en Apache (https://hub.docker.com/u/apache) is een gesponsorde publisher die o.a. Hadoop en Spark images aanbiedt.
+
 
 \section{Virtual IT Company (VIC)}
 VIC is een ``bedrijf'' van HOGENT dat virtuele machines voorziet voor studenten, zodat bepaalde oplossingen niet op een eigen computer moeten draaien. Op aanvraag van studenten worden virtuele machine(s) opgezet en wordt er een soort van contract afgesproken met machine specs en lifespan.
@@ -341,7 +345,7 @@ Daarnaast worden ook Docker containers ondersteund door VMWare vSphere, dus dit 
 Kubernetes wordt door vSphere ondersteund op 2 manieren: ofwel door gebruik te maken van de vSphere Pods waarbij het beheer van de Docker containers nog steeds via de traditionele vSphere Admin verloopt, die een subset van de Kubernetes configuratie ondersteunt, ofwel via de Tanzu Kubernetes cluster. Dit is software van VMWare die apart kan worden geïnstalleerd en die de Kubernetes manier van werken ondersteunt en dus ook meer controle biedt over het beheer van de Kubernetes cluster.
 \newline
 \newline
-Momenteel wordt er nog geen Kubernetes gebruikt in het VIC. Het integreren van Kubernetes is een omvangrijke taak waar op dit moment binnenin het VIC geen resources voor zijn (dit zou een bachelorproef op zichzelf zijn)
+Momenteel wordt er nog geen Kubernetes gebruikt in het VIC en is Tanzu Kubernetes ook niet geïnstalleerd. Het integreren van Kubernetes is een omvangrijke taak waar op dit moment binnenin het VIC geen resources voor zijn (dit zou een bachelorproef op zichzelf zijn)
 \newline
 Containertechnologie zoals Docker containers en Docker Compose worden al meer dan een jaar gebruikt, waarbij de Docker Engine geïnstalleerd is in virtuele machines.
 \newline
@@ -367,4 +371,4 @@ Een master node komt overeen met vCenter Server en een worker node is een machin
 
 
 \subsection{Namespace}
-Namespaces zijn een mechanisme om de beschikbare resources binnen een Kubernetes cluster in te delen in groepen en dan die groepen toe te wijzen aan teams van gebruikers of projecten. Dit is vooral nuttig indien meerdere personen rechtstreeks gebruik maken van Kubernetes om zelf containers te deployen. Dit is hier niet aan de orde dus Namespaces zijn van geen belang voor ons. Volgens \textcite{Kubernetes2023c} zijn Namespaces niet bedoeld zijn voor clusters tot enkele tientallen gebruikers. Namespaces zijn vergelijkbaar met vSphere Resource Pools volgens \textcite{VMware2019}.
+Namespaces zijn een mechanisme om de beschikbare resources binnen een Kubernetes cluster in te delen in groepen en dan die groepen toe te wijzen aan teams van gebruikers of projecten. Dit is vooral nuttig indien meerdere personen rechtstreeks gebruik maken van Kubernetes om zelf containers te deployen. Dit is hier niet aan de orde, het is de bedoeling dat alle installaties uitgevoerd worden door een administrator, dus Kubernetes Namespaces zijn hier van geen belang. Volgens \textcite{Kubernetes2023c} zijn Namespaces ook niet bedoeld voor kleine clusters tot enkele tientallen gebruikers. Namespaces zijn vergelijkbaar met vSphere Resource Pools volgens \textcite{VMware2019}.
