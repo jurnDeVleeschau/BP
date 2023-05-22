@@ -25,14 +25,14 @@ De schaalbaarheid bij Spark bijvoorbeeld, is doordat het werk verdeeld wordt ove
 \newline
 \begin{figure}[H]
     \includegraphics[scale=0.7]{cluster-overview.png}
-    \caption{Spark Worker Nodes \autocite{Spark2023e}}
+    \caption{Spark Worker Nodes \autocite{Spark2023e}.}
 \end{figure}
 
 Een van de onderdelen van Hadoop is YARN, een resource manager en job scheduler die instaat voor de verdeling van het werk over de verschillende cluster nodes en dus zorgt voor de schaalbaarheid. Zie figuur 3.2.
 \newline
 \begin{figure}[H]
     \includegraphics[scale=0.7]{yarn_architecture.png}
-    \caption{Hadoop YARN nodes en containers\autocite{Hadoop2023d}}
+    \caption{Hadoop YARN nodes en containers \autocite{Hadoop2023d}.}
 \end{figure}
 
 Merk op dat het bij real-world installaties van deze applicaties, het meestal de bedoeling is dat de Big Data oplossingen achterliggend gebruikt worden door eigen applicaties en dat gewone ``gebruikers'' op geen enkele manier rechtstreeks toegang krijgen tot bv. Hadoop of Spark.
@@ -41,7 +41,7 @@ Volgens \autocite{Hadoop2023} wordt in een standaard configuratie de Hadoop clus
 Bij de meeste installaties zou dit volstaan als beveiliging, en krijgen enkel de gekende applicaties die er gebruik van maken de netwerk toegang tot de Big Data oplossingen.
 \newline
 \newline
-Dit is niet het geval voor ons, de bedoeling is juist dat de studenten rechtstreeks gebruikmaken van de oplossingen, waarbij één van de doelstellingen van deze bachelorproef is om de verschillende gebruikers (studenten), zowel tijdens de les als tijdens examens volledig afgezonderd te laten werken. Die afzondering geldt zowel op gebied van security als stabiliteit.
+Dit is niet het geval voor ons, de bedoeling is juist dat de studenten rechtstreeks gebruikmaken van de oplossingen, waarbij één van de doelstellingen van deze bachelorproef is om de verschillende gebruikers (studenten), zowel tijdens de les als tijdens examens volledig afgezonderd te laten werken. Die TODO (beter woord) afzondering geldt zowel op gebied van security als stabiliteit.
 
 \subsection{Security}
 
@@ -57,7 +57,7 @@ Volgens \textcite{Hadoop2023} is een zeer goede kennis van Kerberos en DNS verei
 Volgens \textcite{Hadoop2023b} ondersteunt HDFS het gebruik van READ, WRITE en EXECUTE permissies. Daartoe worden alle bestanden en folders geassocieerd met één gebruiker, de eigenaar genoemd, en één groep van gebruikers.
 Op die manier kunnen dan permissies toegekend worden aan de eigenaar, aan de groep en aan alle gebruikers. Dit is typisch ook de manier waarop permissies in Linux systemen functioneren.
 \newline
-Voor gebruikers van Linux komt ook de syntax voor het beheer van de permissies komt bekend voor:
+Voor gebruikers van Linux TODO(double) komt ook de syntax voor het beheer van de permissies komt bekend voor:
 \begin{lstlisting}
 hdfs dfs –chmod -R go+w <file/dir>
 \end{lstlisting}
@@ -66,12 +66,12 @@ Voorwaarde voor de toepassing van deze permissies is dat de gebruiker is gekend,
 
 \subsubsection {Spark authenticatie en authorisatie} \autocite{Spark2023c}
 Net zoals bij Hadoop zijn security functionaliteiten zoals authenticatie niet actief bij een standaard installatie van Spark. Als er geen afscherming is van de netwerk toegang, moet communicatie tussen de Spark processen afgeschermd worden d.m.v. authenticatie en encryptie, en moet voor de lokale opslag ook encryptie gebruikt worden. De Web User Interface moet beschermd worden door authenticatie, en daarvoor moeten Java servlet filters gebruikt worden, die echter niet door Spark worden aangeboden en dus moeten gebouwd worden op maat van het systeem dat de authenticatie zal doen.
-Er zijn voorbeelden te vinden van dit soort filters, meestal gebaseerd op Basic Authentication (zie verder bij nginx). Op volgende blog vind je een voorbeeld van een eigen gebouwde filter die een login pagina toevoegt aan Spark: \textcite{Cacoveanu2019}
+Er zijn voorbeelden te vinden van dit soort filters, meestal gebaseerd op Basic Authentication (zie verder bij nginx). Op volgende blog vind je een voorbeeld van een eigen gebouwde filter die een login pagina toevoegt aan Spark: \textcite{Cacoveanu2019}.
 \newline
 \newline
 
 
-\subsubsection{Apache Sentry, Apache Ranger, Apache Knox}
+\subsubsection{Apache Sentry, Apache Ranger, Apache Knox} TODO
 Het evolueert allemaal zeer snel in het Hadoop ecosysteem. Volgens \textcite{Chu2020}, een artikel uit 2020 over Hadoop Security, is Apache Sentry de populaire tool voor Authorizatie. Maar kort daarna werd Apache Sentry een verlaten project en is het verhuisd naar de Attic.
 \newline
 Volgens \textcite{Anand2021} is dit het gevolg van het samengaan van 2 platformen waarbij de keuze is gemaakt om Sentry te vervangen door Ranger. Het artikel bevat een gedetailleerde vergelijking tussen de functionaliteiten van beide oplossingen.
@@ -88,7 +88,7 @@ Volgens \textcite{Maarek2018} ondersteunt Kafka meerdere beveiligingsmechanismes
 \end{itemize}
 
 Gebruikers afschermen van elkaar in een opstelling van Hadoop en Spark, beiden in clusters wordt snel zeer ingewikkeld. Elk van de oplossingen bestaat uit meerdere processen die met elkaar communiceren en ieder onderdeel moet secure opgezet worden zodat gebruikers niet, bewust of per ongeluk, data van elkaar te zien krijgen. We spreken hier over encryptie voor de opslag, authenticatie en encryptie bij communicatie tussen de verschillende processen, authenticatie voor de gebruiker op Hadoop, authenticatie voor de gebruiker op Spark enz.
-De manier van beveiligen is voor elk van deze oplossingen en interne processen op een andere manier, en vraagt om bijkomende softwares zoals LDAP, Kerberos server, enz.
+De manier van beveiligen is voor elk van deze oplossingen en interne processen op een andere manier, en vraagt om bijkomende software pakketten zoals LDAP, Kerberos server, enz.
 
 Voor Kafka is de SASL/PLAINTEXT beveiliging zeker voldoende in ons geval en ook relatief eenvoudig op te zetten. Dit gaan we verder dan ook uitproberen.
 
@@ -96,8 +96,8 @@ Voor Kafka is de SASL/PLAINTEXT beveiliging zeker voldoende in ons geval en ook 
 Elk van de Big Data oplossingen, en Kubernetes, ondersteunen mechanismes om applicaties te verdelen over de pods en van elkaar af te schermen, bij bepaalde onderdelen kunnen er limieten gezet worden op CPU en geheugen gebruik. Deze configuraties zijn gekoppeld aan nodes, containers en applicaties. De achterliggende bedoeling is vooral om de eigen gebouwde applicaties te ondersteunen en vlot te laten beroep doen op de Big Data functionaliteiten. De focus van deze mechanismes, dikwijls gebaseerd op een voorkennis van het soort verwerking dat in de cluster zal gebeuren, ligt minder op rechtstreeks gebruik van de oplossingen door gebruikers die applicaties aan het ontwikkelen zijn.
 \newline
 \newline
-In \textcite{Deane2019} wordt hier dieper op ingegaan en wordt gesproken over het ``lawaaierige buurman probleem''. Het legt uit dat hoe meer gebruikers er komen in de cluster, hoe moeilijker het wordt om ervoor te zorgen dat deze gebruikers geen last van elkaar ondervinden. Daartoe passen beheerders allerlei technieken toe zoals YARN resource pools, prioriteiten stellen, specifieke nodes toewijzen aan applicaties, enz. Een aantal van deze technieken zijn ook niet toepasbaar in ons geval want alle ontwikkelaars moeten gelijk behandeld worden, dus prioriteiten zetten is niet haalbaar, en specifiek werk opslitsen op specifieke nodes is ook niet mogelijk tenzij dan door alle ontwikkelaars aparte nodes te geven.
-De oplossing die volgens \textcite{Deane2019a} dan typisch gebeurt is opslitsen van de cluster in kleinere clusters. Gezien het hier meestal gaat over dezelfde data van een bedrijf bevat elke cluster dan een duplicaat en hierop gaat het artikel dan verder en stelt een soort tussenmodel voor, waarbij de HDFS data op een gedeelde cluster blijft en de MapReduce en Spark verwerking op aparte clusters gebeurt.
+In \textcite{Deane2019} wordt hier dieper op ingegaan en wordt gesproken over het ``lawaaierige buurman probleem''. Het legt uit dat hoe meer gebruikers er komen in de cluster, hoe moeilijker het wordt om ervoor te zorgen dat deze gebruikers geen last van elkaar ondervinden. Daartoe passen beheerders allerlei technieken toe zoals YARN resource pools, prioriteiten stellen, specifieke nodes toewijzen aan applicaties, enz. Een aantal van deze technieken zijn ook niet toepasbaar in ons geval want alle ontwikkelaars moeten gelijk behandeld worden, dus prioriteiten zetten is niet haalbaar, en specifiek werk opsplitsen op specifieke nodes is ook niet mogelijk tenzij dan door alle ontwikkelaars aparte nodes te geven.
+De oplossing die volgens \textcite{Deane2019a} dan typisch gebeurt is opsplitsen van de cluster in kleinere clusters. Gezien het hier meestal gaat over dezelfde data van een bedrijf bevat elke cluster dan een duplicaat en hierop gaat het artikel dan verder en stelt een soort tussenmodel voor, waarbij de HDFS data op een gedeelde cluster blijft en de MapReduce en Spark verwerking op aparte clusters gebeurt.
 \newline
 Aangezien het in ons geval gaat om het gelijktijdg gebruik van de cluster door minder ervaren ontwikkelaars, is de kans op ``lawaaierige buren'' groot.
 
@@ -107,14 +107,14 @@ In vorig hoofdstuk kwam de containertechnologie uitgebreid aan bod en gebaseerd 
 \newline
 We zagen ook dat er meerdere mogelijkheden zijn om zo'n installatie op te zetten, zoals Kubernetes, Docker Swarm, Docker Compose, Docker.
 \newline
-Bij elk van de gebruikte applicaties moeten dus een aanzienlijk aantal nodes opgezet worden voor een basis cluster, gedefinieerd, geconerd en geïnstalleerd.
+Bij elk van de gebruikte applicaties moeten dus een aanzienlijk aantal nodes opgezet worden voor een basis cluster, gedefinieerd, geconerd en geïnstalleerd. TODO
 \newline
 De configuratie kan bijvoorbeeld geconfigureerd worden via Kubernetes of Docker Swarm, of gedefinieerd in YARN die dan beroep doet op Docker om extra containers te starten. Of volgens \textcite{Spark2023d}, Spark die rechtstreeks kan gebruikmaken van Kubernetes, om Executors op Kubernetes Pods aan te maken en er applicaties op uit te voeren.
 \newline
 \newline
 
 \subsection{Conclusie}
-De eerste vraag die we hier proberen te beantwoorden is of een gedeelde cluster de beste oplossing is voor de oefeningen en het examen van de cursus Big Data. Het alternatief is een aparte omgeving voor elke student.
+De eerste vraag die we hier proberen te beantwoorden is of een gedeelde cluster de beste oplossing is voor de oefeningen en het examen van de cursus Big Data Processing. Het alternatief is een aparte omgeving voor elke student.
 \newline
 De installatie van zowel de gedeelde cluster als de aparte omgeving kan geautomatiseerd worden met voornoemde containertechnologie.
 \newline
@@ -130,12 +130,12 @@ In het geval van de studenten is dit niet van toepassing want juist tijdens de o
 \newline
 Merk op dat het wel waarschijnlijk is dat de installatie van één enkele gedeelde cluster minder resources zal gebruiken dan de aparte omgevingen per student. Dit omdat elk element van de oplossing start met een bepaalde overhead en die dus maal het aantal installaties moet vermenigvuldigd worden om tot de totale overhead te komen.
 
-\paragraph{Enkelvoudige installatie}
+\paragraph{Enkelvoudige installatie} TODO
 Het achterliggende idee van gebruik van containertechnologie is dat het eenvoudig is om een container op te starten, te verplaatsen, bijkomende containers te starten, enz. Dit alles gebaseerd op een set Docker images in combinatie met configuratie files.
 \newline
 Het werk kruipt dus eerder in dit alles definiëren en configureren, en is grotendeels onafhankelijk van hoeveel keer het daarna geïnstalleerd moet worden. Een gedeelde cluster zal complexer zijn om op te zetten door de security en stabiliteitsvereisten, terwijl gescheiden installaties eerder meer werk vragen om te voorzien dat er eenvoudig extra instanties kunnen bijkomen.
 \newline
-Zoals ook aangehaald in het vorige stuk over stabiliteit, zal er bij een gedeelde installatie altijd het risico blijven dat de studenten niet 100\% afgeschermd zijn van elkaar, van onbetrouwbare applicaties.
+Zoals ook aangehaald in het vorige stuk over stabiliteit, zal er bij een gedeelde installatie altijd het risico blijven dat de studenten niet 100\% afgeschermd zijn van elkaar, van onbetrouwbare applicaties. TODO
 \newline
 \newline
 \newline
@@ -154,20 +154,20 @@ Een bijkomend voordeel van dit soort aanpak, elke student een eigen omgeving, is
 
 \section{Big data}
 Om meer vertrouwd te geraken met de Big Data oplossingen zijn deze eerst allemaal eens lokaal opgezet via Docker Compose configuraties. Zie Appendix [B: Docker compose].
-Daarbij is er vertrokken van Docker images die beschikbaar zijn op DockerHub en die ook gebruikt worden tijdens de oefeningen van de cursus Big Data.
+Daarbij is er vertrokken van Docker images die beschikbaar zijn op DockerHub en die ook gebruikt worden tijdens de oefeningen van de cursus Big Data Processing.
 \newline
 \newline
 Dit verliep vlot. Pas tijdens het omzetten naar Kubernetes, zie verder, bleek dat het gebruik van Docker en Docker Compose lokaal voor een aantal voordelen zorgt. Bijvoorbeeld dat je eenvoudig een shell kunt openen in om het even welke lokale Docker container en daar commandos kunt uitvoeren die gebruik maken van de geïnstalleerde software in die container. Dit wordt voor de oefeningen gebruikt om bijvoorbeeld Hadoop commandos uit te voeren terwijl er op de lokale machine geen hadoop beschikbaar is. Via 'docker exec' kan de student op de lokale Namenode container aanloggen, er files naar kopiëren en die dan via 'hadoop' commandos naar hdfs in de andere container overbrengen, of Java programma's opstarten.
-Eens de lokale omgeving naar de cloud verhuisd zal zijn kan dit niet meer gebruikt worden en moet hiervoor een andere oplossing komen. De enige opties die we daarvoor zien zijn ofwel een installatie van Hadoop, Spark en Kafka lokaal kopiëren ofwel blijven werken met een Docker container die alle producten bevat maar die enkel als shell dient om de nodiger commandos te kunnen uitvoeren.
+Eens de lokale omgeving naar de cloud verhuisd zal zijn kan dit niet meer gebruikt worden en moet hiervoor een andere oplossing komen. De enige opties die we daarvoor zien zijn ofwel een installatie van Hadoop, Spark en Kafka lokaal kopiëren ofwel blijven werken met een Docker container die alle producten bevat maar die enkel als shell dient om de nodige commandos te kunnen uitvoeren.
 \newline
 
 \section{Security}
-We gaan dus niet voor ëën enkele secure installatie, waarbij alle processen moeten afgeschermd worden en ook alle onderlinge communicatie, want ëën enkele omgeving voor ëën student zal volledig binnen ëën Pod draaien en in eerste instantie dus ook volledig afgeschermd zijn.
-De uitdaging is nu eerder om bepaalde poorten toegankelijk te maken om toe te laten met deze omgeving te werken, maar we willen de toegang tot deze poorten voor elke omgeving wel beperken tot 1 student.
+We gaan dus niet voor \'e\'en enkele secure installatie, waarbij alle processen moeten afgeschermd worden en ook alle onderlinge communicatie, want \'e\'en enkele omgeving voor \'e\'en student zal volledig binnen \'e\'en Pod draaien en in eerste instantie dus ook volledig afgeschermd zijn.
+De uitdaging is nu eerder om bepaalde poorten toegankelijk te maken om toe te laten met deze omgeving te werken, maar we willen de toegang tot deze poorten voor elke omgeving wel beperken tot \'e\'en student.
 
 \subsection{Apache Knox}
 Zoals eerder al aangehaald is Apache Knox een security oplossing die toe laat een Hadoop cluster af te schermen.
-Volgens \textcite{Knox2023} is het een gateway die de toegang tot de cluster vormt voor alle interacties (REST en HTTP), en die authenticatie doet van de gebruikers. Voor die authenticatie worden de typische protocols ondersteunt zoals LDAP/ActiveDirectory, Kerberos, SAML en OAuth. Dit is ideaal in een onderneming om bestaande gebruikers toe te laten, maar voelt overdreven (overkill) in ons geval van 1 gebruiker per omgeving. Er moest dus naar iets eenvoudigers gezocht worden.
+Volgens \textcite{Knox2023} is het een gateway die de toegang tot de cluster vormt voor alle interacties (REST en HTTP), en die authenticatie doet van de gebruikers. Voor die authenticatie worden de typische protocols ondersteund zoals LDAP/ActiveDirectory, Kerberos, SAML en OAuth. Dit is ideaal in een onderneming om bestaande gebruikers toe te laten, maar voelt overdreven (overkill) in ons geval van \'e\'en gebruiker per omgeving. Er moest dus naar iets eenvoudigers gezocht worden.
 
 \subsection{Kubernetes services}
 Volgens \textcite{Kubernetes2023b} zijn services in Kubernetes een manier om toegang te verlenen tot de netwerk applicaties die in één of meerdere Pods in de cluster draaien.
@@ -184,7 +184,7 @@ Nginx (https://www.nginx.com/) is een web server die dikwijls als ingangspunt va
 
 \subsubsection{HTTP Basic Authentication}
 \textcite{Mozilla2023} geeft een goede introductie tot Basic Authentication.
-In essentie is het een onderdeel van het HTTP (en HTTPS) protocol waarbij tijdens de communicatie tussen de Client (typisch de webbrowser) en de (Web) Server, deze laatste een 401 code kan terugsturen en daarmee aangeven aan de Client dat er credentials (een combinatie van gebruikersnaam en paswoord) nodig zijn. Bij een Web Browser worden deze dan gevraagd aan de gebruiker en teruggestuurd naar de Server. Bij andere Clients, bijvoorbeeld applicaties die een REST Service oproepen, worden deze typisch uit configuratie gehaald.
+In essentie is het een onderdeel van het HTTP (en HTTPS) protocol waarbij tijdens de communicatie tussen de Client (typisch de webbrowser) en de (Web) Server, deze laatste een 401 code kan terugsturen en daarmee aangeven aan de client dat er credentials (een combinatie van gebruikersnaam en paswoord) nodig zijn. Bij een web browser worden deze dan gevraagd aan de gebruiker en teruggestuurd naar de server. Bij andere Clients, bijvoorbeeld applicaties die een REST Service oproepen, worden deze typisch uit configuratie gehaald.
 De gebruikersnaam en paswoord worden naar de Server gestuurd in het ``Authorization'' HTTP Header veld, daarbij zijn ze gecodeerd en het meest gebruikte algoritme hiervoor is base64 encoding, maar dit is bijna identiek aan leesbare tekst en biedt dus geen enkele bescherming. Daarom wordt Basic Authentication meestal gebruikt in combinatie met HTTPS, om vertrouwelijkheid te garanderen.
 \newline
 Omdat de inloggegevens in de header van elk HTTP(S)-verzoek moeten worden verzonden, zal een webbrowser ze gedurende een bepaalde periode in de cache opslaan om te voorkomen dat de gebruiker voortdurend de gebruikersnaam en wachtwoord moet ingeven.
@@ -206,20 +206,20 @@ Optioneel kan overal een extra account voor de lesgever, met identiek paswoord v
 \newline
 Als eerste onderzoek voor dit security onderdeel is er, om de configuratie van de Basic Authenticatie te bouwen, een beperkte Kubernetes yaml file gemaakt met alleen maar nginx, deze start en stopt snel tijdens het testen, maar liet al direct toe om Kubernetes Services, Port mapping en Configmap te gebruiken. Dit was ook de eerste keer dat Kubernetes werd gebruikt en dus lokaal moest geïnstalleerd worden.
 \newline
-We kozen voor Kubernetes omdat dit, zoals vermeld in vorig hoofdstuk de iets complexere oplossing is en we dat wilden zelf ondervinden.
+We kozen voor Kubernetes omdat dit, zoals vermeld in vorig hoofdstuk de iets complexere oplossing is en we dat wilden zelf ondervinden. TODO
 \newline
 \newline
 \subsubsection{Configmaps} 
 \autocite{Kubernetes2023}
 \newline
 Een ConfigMap wordt gebruikt om niet-beveiligde configuratie gegevens te beheren in sleutel-waarde formaat, en ter beschikking te stellen van de Pods en Containers, als omgevingsvariabele of als (configuratie) bestand via een volume.
-Een ConfigMap bevat typisch de configuratie die is losgekoppeld van het Docker image om op die manier images meer generiek inzetbaar te maken.\textcite{Kubernetes2023}
+Een ConfigMap bevat typisch de configuratie die is losgekoppeld van het Docker image om op die manier images meer generiek inzetbaar te maken \textcite{Kubernetes2023}.
 
 
 Initieel waren er hier problemen met het configureren van de volumes omdat Kubernetes volumes op een andere manier werken dan de volumes van Docker Compose, waar er eenvoudig verwezen kan worden naar lokale folders op de machine waar de container draait, terwijl bij Kubernetes alles in de Configmap gestopt wordt om op die manier van Pod te kunnen switchen of uitbreiden, en de configuratie (files) mee moet kunnen naar alle pods.
 \newline
 \newline
-In de ConfigMap werd de nginx.conf file gestopt en de paswoord file voor Basic Authentication.
+In de ConfigMap werd de nginx.conf file toegevoegd en de paswoord file voor Basic Authentication.
 Uiteindelijk met volgende configuratie kwam de popup voor Basic Authentication te voorschijn.
 \newpage
 Definitie van de nginx container, met verwijzen naar de nginx.conf file voor de configuratie en de password.conf file voor de definitie van gebruikers en paswoorden:
@@ -366,7 +366,7 @@ Met volgende commando werd een certificaat aangemaakt dat vanuit de Docker conta
 
 Merk op dat dit enkel voor lokale testen is, OpenSSL maakt self-signed certificaten aan en deze geven in de browser foutmeldingen omdat ze niet uitgegeven en getekend zijn door een vertrouwde instantie.
 \newline
-In deze aanpak, met voor elke student een omgeving en voor elke omgeving meerdere containers die toegankelijk moeten zijn via een uniek adres, zal een Wildcard Certificaat nodig zijn. Volgens \textcite{Digicert2023} is dit één enkel certificaat voor een basis domainnaam, bijvoorbeeld ``bigdatavic.be'' dat toelaat om ongelimiteerde domainnamen te beveiligen. Die domainnamen moeten dan allemaal tot het basisdomain behoren, bijvoorbeeld ``hadoop1.bigdatavic.be'', ``hadoop2.bigdatavic.be'', ``spark1.bigdatavic.be'', enz.
+In deze aanpak, met voor elke student een omgeving en voor elke omgeving meerdere containers die toegankelijk moeten zijn via een uniek adres, zal een Wildcard Certificaat nodig zijn. \sloppypar Volgens \textcite{Digicert2023} is dit één enkel certificaat voor een basis domainnaam, bijvoorbeeld ``bigdatavic.be'' dat toelaat om ongelimiteerde domainnamen te beveiligen. Die domainnamen moeten dan allemaal tot het basisdomain behoren, bijvoorbeeld ``hadoop1.bigdatavic.be'', ``hadoop2.bigdatavic.be'', ``spark1.bigdatavic.be'', enz.
 \newline
 Op het VIC wordt nginx al als reverse proxy gebruikt, deze zou de aparte nginx reverse proxies in elke omgeving kunnen vervangen, maar dan moet alle proxy configuratie voor alle omgevingen daar opgezet worden.
 \newline
@@ -522,29 +522,29 @@ Configuratie van de gebruikers:
 
 Na deze wijziging moest het Producer voorbeeld uit de oefeningen de juiste credentials doorgeven aan Kafka anders werd het geweigerd.
 
-\section{Geheugen gebruik van de oplossing}
+\section{Geheugen gebruik van de oplossing} TODO command om resoruce te zien toevoegen ``docker stats''
 De volgende screenshots (figuren 3.3, 3.4, 3.5 en 3.6) zijn gemaakt na deployment van de Hadoop omgeving in 1 Pod en in 2 Pods. Elke Pod gebruikt ongeveer evenveel geheugen, dus voor elke student omgeving komt hetzelfde geheugengebruik, zon'n 750 MB, erbij.
 
 \begin{figure}[H]
     \includegraphics[scale=0.6]{Hadoop resource usage.png}
-    \caption{Resources gebruik van alle containers - 1 omgeving met Hadoop}
+    \caption{Resources gebruik van alle containers - 1 omgeving met Hadoop.}
 \end{figure}
 
 \begin{figure}[H]
     \includegraphics[scale=0.6]{Hadoop 2 pods resource usage.png}
-    \caption{Resources gebruik - 2 omgevingen met Hadoop}
+    \caption{Resources gebruik - 2 omgevingen met Hadoop.}
 \end{figure}
 
-Volgende screenshot is voor 1 omgeving met Spark erbij. Een Spark master en een Spark worker gebruiken ieder zo'n 75 MB. Dus het gedeelte dat erbij komt voor Spark is beperkt in vergelijking met Hadoop.
+Volgende screenshot (figuur 3.5) is voor 1 omgeving met Spark erbij. Een Spark master en een Spark worker gebruiken ieder zo'n 75 MB. Dus het gedeelte dat erbij komt voor Spark is beperkt in vergelijking met Hadoop.
 \begin{figure}[H]
     \includegraphics[scale=0.7]{Hadoop and Spark resource usage.png}
-    \caption{Resources gebruik van Spark - 1 omgeving met Hadoop en Spark}
+    \caption{Resources gebruik van Spark - 1 omgeving met Hadoop en Spark.}
 \end{figure}
 
 Volgende screenshot is voor 1 Kafka omgeving. Opnieuw veel beperkter gebruik in vergelijking met Hadoop.
 \begin{figure}[H]
     \includegraphics[scale=0.9]{Kafka resource usage.png}
-    \caption{Resources gebruik - 1 omgeving met Kafka}
+    \caption{Resources gebruik - 1 omgeving met Kafka.}
 \end{figure}
 
 Hadoop heeft dus duidelijk de grootste invloed en alles bij elkaar genomen is de omgeving zelf, voor 1 student, toch wel resource intensief. Dit is onafhankelijk van de resources nodig voor Kubernetes en zou dus hetzelfde resultaat geven bij gebruik van Docker Compose of Swarm.
