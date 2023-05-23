@@ -41,7 +41,7 @@ Volgens \autocite{Hadoop2023} wordt in een standaard configuratie de Hadoop clus
 Bij de meeste installaties zou dit volstaan als beveiliging, en krijgen enkel de gekende applicaties die er gebruik van maken de netwerk toegang tot de Big Data oplossingen.
 \newline
 \newline
-Dit is niet het geval voor ons, de bedoeling is juist dat de studenten rechtstreeks gebruikmaken van de oplossingen, waarbij één van de doelstellingen van deze bachelorproef is om de verschillende gebruikers (studenten), zowel tijdens de les als tijdens examens volledig afgezonderd te laten werken. Die TODO (beter woord) afzondering geldt zowel op gebied van security als stabiliteit.
+Dit is hier niet het geval, de bedoeling is juist dat de studenten rechtstreeks gebruikmaken van de oplossingen, waarbij één van de doelstellingen van deze bachelorproef is om de verschillende gebruikers (studenten), zowel tijdens de les als tijdens examens volledig afgezonderd te laten werken. Die volledige scheiding van de gebruikers geldt zowel op gebied van security als stabiliteit.
 
 \subsection{Security}
 
@@ -50,16 +50,14 @@ Volgens \textcite{Kiran2022} biedt Hadoop security alle onderdelen van een typis
 De authenticatie steunt op Kerberos, volgens \textcite{Kerberos2023} een netwerk authenticatie protocol gebaseerd op encryptie en geheime sleutels. Het wordt typisch gebruikt in omgevingen met meerdere partijen die elkaar moeten vertrouwen en waarvoor dus authenticatie vereist is. Er is een implementatie beschikbaar, gemaakt door het MIT en het is beschikbaar zowel als Docker Image als in de typische Linux distributies.
 \newline
 Volgens \textcite{Hadoop2023} is een zeer goede kennis van Kerberos en DNS vereist om Hadoop services op te zetten in 'secure mode'.
-\newline
-\newline
 
 \subsubsection{Secure HDFS}
 Volgens \textcite{Hadoop2023b} ondersteunt HDFS het gebruik van READ, WRITE en EXECUTE permissies. Daartoe worden alle bestanden en folders geassocieerd met één gebruiker, de eigenaar genoemd, en één groep van gebruikers.
 Op die manier kunnen dan permissies toegekend worden aan de eigenaar, aan de groep en aan alle gebruikers. Dit is typisch ook de manier waarop permissies in Linux systemen functioneren.
 \newline
-Voor gebruikers van Linux TODO(double) komt ook de syntax voor het beheer van de permissies komt bekend voor:
+Voor gebruikers van Linux komt ook de syntax voor het beheer van de permissies bekend voor:
 \begin{lstlisting}
-hdfs dfs –chmod -R go+w <file/dir>
+    hdfs dfs –chmod -R go+w <file/dir>
 \end{lstlisting}
 Voorwaarde voor de toepassing van deze permissies is dat de gebruiker is gekend, geauthentificeerd door Kerberos, en dat de groepen waartoe de gebruiker behoort gekend zijn. Voor dit laatste doet HDFS volgens \textcite{Hadoop2023c} een beroep op bijvoorbeeld het Operating Systeem of een LDAP server.
 
@@ -67,56 +65,53 @@ Voorwaarde voor de toepassing van deze permissies is dat de gebruiker is gekend,
 \subsubsection {Spark authenticatie en authorisatie} \autocite{Spark2023c}
 Net zoals bij Hadoop zijn security functionaliteiten zoals authenticatie niet actief bij een standaard installatie van Spark. Als er geen afscherming is van de netwerk toegang, moet communicatie tussen de Spark processen afgeschermd worden d.m.v. authenticatie en encryptie, en moet voor de lokale opslag ook encryptie gebruikt worden. De Web User Interface moet beschermd worden door authenticatie, en daarvoor moeten Java servlet filters gebruikt worden, die echter niet door Spark worden aangeboden en dus moeten gebouwd worden op maat van het systeem dat de authenticatie zal doen.
 Er zijn voorbeelden te vinden van dit soort filters, meestal gebaseerd op Basic Authentication (zie verder bij nginx). Op volgende blog vind je een voorbeeld van een eigen gebouwde filter die een login pagina toevoegt aan Spark: \textcite{Cacoveanu2019}.
-\newline
-\newline
 
 
-\subsubsection{Apache Sentry, Apache Ranger, Apache Knox} TODO
+\subsubsection{Apache Sentry, Apache Ranger}
 Het evolueert allemaal zeer snel in het Hadoop ecosysteem. Volgens \textcite{Chu2020}, een artikel uit 2020 over Hadoop Security, is Apache Sentry de populaire tool voor Authorizatie. Maar kort daarna werd Apache Sentry een verlaten project en is het verhuisd naar de Attic.
 \newline
 Volgens \textcite{Anand2021} is dit het gevolg van het samengaan van 2 platformen waarbij de keuze is gemaakt om Sentry te vervangen door Ranger. Het artikel bevat een gedetailleerde vergelijking tussen de functionaliteiten van beide oplossingen.
 \newline
 In \textcite{Soo2020} is er nog een vergelijking, met nog een aantal andere tools en daaruit komt Apache Ranger als de beste keuze.
-
+Verder in dit hoofdstuk komt trouwens ook nog Apache Knox aan bod als security oplossing voor een Hadoop cluster.
 
 \subsubsection {Kafka}
 Volgens \textcite{Maarek2018} ondersteunt Kafka meerdere beveiligingsmechanismes zijnde:
 \begin{itemize}
-    \item Encryptie van alle data die tussen de Producers, Kafka en de Consumers wordt uitgewisseld. Dit is in ons geval van geen belang, we willen vooral de toegang van de studenten tot elkaars werk afschermen, we gaan er niet van uit dat de gegevens die op het netwerk worden uitgewisseld kwetsbaar zijn gedurende de beperkte periode van een les of examen.
+    \item Encryptie van alle data die tussen de Producers, Kafka en de Consumers wordt uitgewisseld. Dit is in dit geval van geen belang. De toegang van de studenten tot elkaars werk dient te worden afgeschermd en de gegevens die op het netwerk worden uitgewisseld zijn enkel gedurende de beperkte periode van een les of examen kwetsbaar.
     \item Authenticatie met SSL of SASL: de toegang tot de Kafka cluster wordt enkel toegelaten voor gebruikers die zich kunnen identificeren. Deze identificatie kan met ``SSL'', waarbij de Kafka broker de identititeit van de applicatie verifieerd door middel van SSL certificaten, of met een aantal andere authenticatie mechanismes gaande van PLAINTEXT (eenvoudige gebruikersnaam/paswoord combinatie) tot GSSAPI (Kerberos tickets). Merk op dat ook in deze gevallen SSL wordt gebruikt om op een veilige manier te communiceren.
     \item Authorizatie laat toe om de permissies te definiëren die bepalen of een bepaalde geïdentificeerde gebruiker (applicatie) toegang krijgt tot bepaalde topics om te lezen of the schrijven.
 \end{itemize}
 
-Gebruikers afschermen van elkaar in een opstelling van Hadoop en Spark, beiden in clusters wordt snel zeer ingewikkeld. Elk van de oplossingen bestaat uit meerdere processen die met elkaar communiceren en ieder onderdeel moet secure opgezet worden zodat gebruikers niet, bewust of per ongeluk, data van elkaar te zien krijgen. We spreken hier over encryptie voor de opslag, authenticatie en encryptie bij communicatie tussen de verschillende processen, authenticatie voor de gebruiker op Hadoop, authenticatie voor de gebruiker op Spark enz.
+Gebruikers afschermen van elkaar in een opstelling van Hadoop en Spark, beiden in clusters wordt snel zeer ingewikkeld. Elk van de oplossingen bestaat uit meerdere processen die met elkaar communiceren en ieder onderdeel moet secure opgezet worden zodat gebruikers niet, bewust of per ongeluk, data van elkaar te zien krijgen. Het betreft hier encryptie voor de opslag, authenticatie en encryptie bij communicatie tussen de verschillende processen, authenticatie voor de gebruiker op Hadoop, authenticatie voor de gebruiker op Spark enz.
 De manier van beveiligen is voor elk van deze oplossingen en interne processen op een andere manier, en vraagt om bijkomende software pakketten zoals LDAP, Kerberos server, enz.
 
-Voor Kafka is de SASL/PLAINTEXT beveiliging zeker voldoende in ons geval en ook relatief eenvoudig op te zetten. Dit gaan we verder dan ook uitproberen.
+Voor Kafka is de SASL/PLAINTEXT beveiliging zeker voldoende in dit geval en ook relatief eenvoudig op te zetten. Dit wordt dan ook verder uitgevoerd.
 
 \subsection{Stabiliteit}
 Elk van de Big Data oplossingen, en Kubernetes, ondersteunen mechanismes om applicaties te verdelen over de pods en van elkaar af te schermen, bij bepaalde onderdelen kunnen er limieten gezet worden op CPU en geheugen gebruik. Deze configuraties zijn gekoppeld aan nodes, containers en applicaties. De achterliggende bedoeling is vooral om de eigen gebouwde applicaties te ondersteunen en vlot te laten beroep doen op de Big Data functionaliteiten. De focus van deze mechanismes, dikwijls gebaseerd op een voorkennis van het soort verwerking dat in de cluster zal gebeuren, ligt minder op rechtstreeks gebruik van de oplossingen door gebruikers die applicaties aan het ontwikkelen zijn.
 \newline
 \newline
-In \textcite{Deane2019} wordt hier dieper op ingegaan en wordt gesproken over het ``lawaaierige buurman probleem''. Het legt uit dat hoe meer gebruikers er komen in de cluster, hoe moeilijker het wordt om ervoor te zorgen dat deze gebruikers geen last van elkaar ondervinden. Daartoe passen beheerders allerlei technieken toe zoals YARN resource pools, prioriteiten stellen, specifieke nodes toewijzen aan applicaties, enz. Een aantal van deze technieken zijn ook niet toepasbaar in ons geval want alle ontwikkelaars moeten gelijk behandeld worden, dus prioriteiten zetten is niet haalbaar, en specifiek werk opsplitsen op specifieke nodes is ook niet mogelijk tenzij dan door alle ontwikkelaars aparte nodes te geven.
+In \textcite{Deane2019} wordt hier dieper op ingegaan en wordt gesproken over het ``lawaaierige buurman probleem''. Het legt uit dat hoe meer gebruikers er komen in de cluster, hoe moeilijker het wordt om ervoor te zorgen dat deze gebruikers geen last van elkaar ondervinden. Daartoe passen beheerders allerlei technieken toe zoals YARN resource pools, prioriteiten stellen, specifieke nodes toewijzen aan applicaties, enz. Een aantal van deze technieken zijn ook niet toepasbaar in dit geval want alle ontwikkelaars moeten gelijk behandeld worden, dus prioriteiten zetten is niet haalbaar, en specifiek werk opsplitsen op specifieke nodes is ook niet mogelijk tenzij dan door alle ontwikkelaars aparte nodes te geven.
 De oplossing die volgens \textcite{Deane2019a} dan typisch gebeurt is opsplitsen van de cluster in kleinere clusters. Gezien het hier meestal gaat over dezelfde data van een bedrijf bevat elke cluster dan een duplicaat en hierop gaat het artikel dan verder en stelt een soort tussenmodel voor, waarbij de HDFS data op een gedeelde cluster blijft en de MapReduce en Spark verwerking op aparte clusters gebeurt.
 \newline
-Aangezien het in ons geval gaat om het gelijktijdg gebruik van de cluster door minder ervaren ontwikkelaars, is de kans op ``lawaaierige buren'' groot.
+Aangezien het in dit geval gaat om het gelijktijdg gebruik van de cluster door minder ervaren ontwikkelaars, is de kans op ``lawaaierige buren'' groot.
 
 
-\subsection{Installatie met containertechnologie}
-In vorig hoofdstuk kwam de containertechnologie uitgebreid aan bod en gebaseerd op alle informatie die we onderzochten lijkt het gebruik van containers een goede piste om de installatie te vereenvoudigen.
+\subsection{Installatie met container technologie}
+In vorig hoofdstuk kwam de container technologie uitgebreid aan bod en gebaseerd op alle informatie die we onderzochten lijkt het gebruik van containers een goede piste om de installatie te vereenvoudigen.
 \newline
 We zagen ook dat er meerdere mogelijkheden zijn om zo'n installatie op te zetten, zoals Kubernetes, Docker Swarm, Docker Compose, Docker.
 \newline
-Bij elk van de gebruikte applicaties moeten dus een aanzienlijk aantal nodes opgezet worden voor een basis cluster, gedefinieerd, geconerd en geïnstalleerd. TODO
+Bij elk van de gebruikte applicaties moeten dus een aanzienlijk aantal nodes opgezet worden voor een basis cluster, gedefinieerd, geconfigureerd en geïnstalleerd.
 \newline
-De configuratie kan bijvoorbeeld geconfigureerd worden via Kubernetes of Docker Swarm, of gedefinieerd in YARN die dan beroep doet op Docker om extra containers te starten. Of volgens \textcite{Spark2023d}, Spark die rechtstreeks kan gebruikmaken van Kubernetes, om Executors op Kubernetes Pods aan te maken en er applicaties op uit te voeren.
-\newline
-\newline
+Deze opzet kan bijvoorbeeld gedefinieerd worden via Kubernetes of Docker Swarm, of in YARN die dan beroep doet op Docker om extra containers te starten. Of volgens \textcite{Spark2023d}, Spark die rechtstreeks kan gebruikmaken van Kubernetes, om Executors op Kubernetes pods aan te maken en er applicaties op uit te voeren.
+
 
 \subsection{Conclusie}
 De eerste vraag die we hier proberen te beantwoorden is of een gedeelde cluster de beste oplossing is voor de oefeningen en het examen van de cursus Big Data Processing. Het alternatief is een aparte omgeving voor elke student.
 \newline
-De installatie van zowel de gedeelde cluster als de aparte omgeving kan geautomatiseerd worden met voornoemde containertechnologie.
+De installatie van zowel de gedeelde cluster als de aparte omgeving kan geautomatiseerd worden met voornoemde container technologie.
 \newline
 We zien een aantal mogelijke redenen om te kiezen voor een gedeelde Big Data cluster: reden 1 is gedeelde data, reden 2 is optimaal gebruik van resources en reden 3 is de enkelvoudige installatie t.o.v. een installatie voor elke student.
 
@@ -130,12 +125,12 @@ In het geval van de studenten is dit niet van toepassing want juist tijdens de o
 \newline
 Merk op dat het wel waarschijnlijk is dat de installatie van één enkele gedeelde cluster minder resources zal gebruiken dan de aparte omgevingen per student. Dit omdat elk element van de oplossing start met een bepaalde overhead en die dus maal het aantal installaties moet vermenigvuldigd worden om tot de totale overhead te komen.
 
-\paragraph{Enkelvoudige installatie} TODO
-Het achterliggende idee van gebruik van containertechnologie is dat het eenvoudig is om een container op te starten, te verplaatsen, bijkomende containers te starten, enz. Dit alles gebaseerd op een set Docker images in combinatie met configuratie files.
+\paragraph{Enkelvoudige t.o.v. meervoudige installatie}
+Het achterliggende idee van gebruik van container technologie is dat het eenvoudig is om een container op te starten, te verplaatsen, bijkomende containers te starten, enz. Dit alles gebaseerd op een set Docker images in combinatie met configuratie files.
 \newline
 Het werk kruipt dus eerder in dit alles definiëren en configureren, en is grotendeels onafhankelijk van hoeveel keer het daarna geïnstalleerd moet worden. Een gedeelde cluster zal complexer zijn om op te zetten door de security en stabiliteitsvereisten, terwijl gescheiden installaties eerder meer werk vragen om te voorzien dat er eenvoudig extra instanties kunnen bijkomen.
 \newline
-Zoals ook aangehaald in het vorige stuk over stabiliteit, zal er bij een gedeelde installatie altijd het risico blijven dat de studenten niet 100\% afgeschermd zijn van elkaar, van onbetrouwbare applicaties. TODO
+Zoals ook aangehaald in het vorige stuk over stabiliteit, zal er bij een gedeelde installatie altijd het risico blijven dat de studenten niet 100\% afgeschermd zijn van elkaar, en dus kan de onbetrouwbare applicatie van \'e\'en student alle andere studenten beletten te werken.
 \newline
 \newline
 \newline
@@ -162,61 +157,60 @@ Eens de lokale omgeving naar de cloud verhuisd zal zijn kan dit niet meer gebrui
 \newline
 
 \section{Security}
-We gaan dus niet voor \'e\'en enkele secure installatie, waarbij alle processen moeten afgeschermd worden en ook alle onderlinge communicatie, want \'e\'en enkele omgeving voor \'e\'en student zal volledig binnen \'e\'en Pod draaien en in eerste instantie dus ook volledig afgeschermd zijn.
+We gaan dus niet voor \'e\'en enkele secure installatie, waarbij alle processen moeten afgeschermd worden en ook alle onderlinge communicatie, want \'e\'en enkele omgeving voor \'e\'en student zal volledig binnen \'e\'en pod draaien en in eerste instantie dus ook volledig afgeschermd zijn.
 De uitdaging is nu eerder om bepaalde poorten toegankelijk te maken om toe te laten met deze omgeving te werken, maar we willen de toegang tot deze poorten voor elke omgeving wel beperken tot \'e\'en student.
 
 \subsection{Apache Knox}
 Zoals eerder al aangehaald is Apache Knox een security oplossing die toe laat een Hadoop cluster af te schermen.
-Volgens \textcite{Knox2023} is het een gateway die de toegang tot de cluster vormt voor alle interacties (REST en HTTP), en die authenticatie doet van de gebruikers. Voor die authenticatie worden de typische protocols ondersteund zoals LDAP/ActiveDirectory, Kerberos, SAML en OAuth. Dit is ideaal in een onderneming om bestaande gebruikers toe te laten, maar voelt overdreven (overkill) in ons geval van \'e\'en gebruiker per omgeving. Er moest dus naar iets eenvoudigers gezocht worden.
+Volgens \textcite{Knox2023} is het een gateway die de toegang tot de cluster vormt voor alle interacties (REST en HTTP), en die authenticatie doet van de gebruikers. Voor die authenticatie worden de typische protocols ondersteund zoals LDAP/ActiveDirectory, Kerberos, SAML en OAuth. Dit is ideaal in een onderneming om bestaande gebruikers toe te laten, maar dit is overdreven (overkill) bij \'e\'en gebruiker per omgeving. Er moet dus naar iets eenvoudigers gezocht worden.
 
 \subsection{Kubernetes services}
-Volgens \textcite{Kubernetes2023b} zijn services in Kubernetes een manier om toegang te verlenen tot de netwerk applicaties die in één of meerdere Pods in de cluster draaien.
+Volgens \textcite{Kubernetes2023b} zijn services in Kubernetes een manier om toegang te verlenen tot de netwerk applicaties die in één of meerdere pods in de cluster draaien.
 \newline
-Aangezien deze applicaties op elk moment van Pod kunnen wijzigen of in meerdere Pods opgestart worden, is er een mechanisme nodig die dit opvangt en zorgt dat de applicaties toegankelijk blijven voor de buitenwereld. Dit zijn de Kubernetes Services.
+Aangezien deze applicaties op elk moment van pod kunnen wijzigen of in meerdere pods opgestart worden, is er een mechanisme nodig die dit opvangt en zorgt dat de applicaties toegankelijk blijven voor de buitenwereld. Dit zijn de Kubernetes Services.
 \newline
-Er zijn meerdere types services maar voor onze oplossing is het Ingress type van belang omdat het volgens \autocite{Kubernetes2023d} een HTTP(S) ingangspunt is in combinatie met regels voor routing, maar verder geen functionaliteit biedt. Er moet een process komen dat dit opvangt en 1 van de implementaties is de Ingress-Nginx controller. Dit is een integratie van Nginx uitgebreid met Kubernetes integratie mechanismes voor o.a. herstarten/herladen bij configuratie wijzigingen. Bij onze opzet zijn er geen wijzigingen eens de omgeving is opgestart, dus werd er een test opgezet met een gewone Nginx die dan deel uitmaakt van de containers in de Kubernetes Pod.
+Er zijn meerdere types services maar voor onze oplossing is het Ingress type van belang omdat het volgens \autocite{Kubernetes2023d} een HTTP(S) ingangspunt is in combinatie met regels voor routing, maar verder geen functionaliteit biedt. Er moet een process komen dat dit opvangt en \'e\'en van de implementaties is de Ingress-Nginx controller. Dit is een integratie van Nginx uitgebreid met Kubernetes integratie mechanismes voor o.a. herstarten/herladen bij configuratie wijzigingen. Bij onze opzet zijn er geen wijzigingen eens de omgeving is opgestart, dus werd er een test opgezet met een gewone Nginx die dan deel uitmaakt van de containers in de Kubernetes pod.
 
 \subsection{Nginx}
 Nginx (https://www.nginx.com/) is een web server die dikwijls als ingangspunt van een web site gebruikt wordt, reverse proxy genoemd, en die zorgt dat de achterliggende structuur afgeschermd is voor de buitenwereld. Daarnaast kan het zorgen voor Load Balancing en beveiliging (HTTP Basic Authentication, SSL/TLS offloading).
-\newline
-\newline
+
 
 
 \subsubsection{HTTP Basic Authentication}
 \textcite{Mozilla2023} geeft een goede introductie tot Basic Authentication.
-In essentie is het een onderdeel van het HTTP (en HTTPS) protocol waarbij tijdens de communicatie tussen de Client (typisch de webbrowser) en de (Web) Server, deze laatste een 401 code kan terugsturen en daarmee aangeven aan de client dat er credentials (een combinatie van gebruikersnaam en paswoord) nodig zijn. Bij een web browser worden deze dan gevraagd aan de gebruiker en teruggestuurd naar de server. Bij andere Clients, bijvoorbeeld applicaties die een REST Service oproepen, worden deze typisch uit configuratie gehaald.
-De gebruikersnaam en paswoord worden naar de Server gestuurd in het ``Authorization'' HTTP Header veld, daarbij zijn ze gecodeerd en het meest gebruikte algoritme hiervoor is base64 encoding, maar dit is bijna identiek aan leesbare tekst en biedt dus geen enkele bescherming. Daarom wordt Basic Authentication meestal gebruikt in combinatie met HTTPS, om vertrouwelijkheid te garanderen.
+In essentie is het een onderdeel van het HTTP (en HTTPS) protocol waarbij tijdens de communicatie tussen de client (typisch de webbrowser) en de (web) server, deze laatste een 401 code kan terugsturen en daarmee aangeven aan de client dat er credentials (een combinatie van gebruikersnaam en paswoord) nodig zijn. Bij een web browser worden deze dan gevraagd aan de gebruiker en teruggestuurd naar de server. Bij andere clients, bijvoorbeeld applicaties die een REST Service oproepen, worden deze typisch uit configuratie gehaald.
+De gebruikersnaam en paswoord worden naar de server gestuurd in het ``Authorization'' HTTP Header veld, daarbij zijn ze gecodeerd en het meest gebruikte algoritme hiervoor is base64 encoding, maar dit is bijna identiek aan leesbare tekst en biedt dus geen enkele bescherming. Daarom wordt Basic Authentication meestal gebruikt in combinatie met HTTPS, om vertrouwelijkheid te garanderen.
 \newline
 Omdat de inloggegevens in de header van elk HTTP(S)-verzoek moeten worden verzonden, zal een webbrowser ze gedurende een bepaalde periode in de cache opslaan om te voorkomen dat de gebruiker voortdurend de gebruikersnaam en wachtwoord moet ingeven.
 \newline
 \newline
-Basic Authentication lijkt me voldoende, per omgeving moeten dan de inloggegevens voor 1 gebruiker, de student, opgezet worden. Nginx ondersteunt meerdere mechanismen voor authenticatie waaronder een eenvoudig paswoord bestand. Deze is in het formaat
+Basic Authentication lijkt me voldoende, per omgeving moeten dan de inloggegevens voor \'e\'en gebruiker, de student, opgezet worden. Nginx ondersteunt meerdere mechanismen voor authenticatie waaronder een eenvoudig paswoord bestand. Deze is in het formaat
 \newline
 \newline
 \begin{lstlisting}
-user1:$apr1$/woC1jnP$KAh0SsVn5qeSMjTtn0E9Q0
-user2:$apr1$QdR8fNLT$vbCEEzDj7LyqCMyNpSoBh/
-user3:$apr1$Mr5A0e.U$0j39Hp5FfxRkneklXaMrr/ 
+    user1:$apr1$/woC1jnP$KAh0SsVn5qeSMjTtn0E9Q0
+    user2:$apr1$QdR8fNLT$vbCEEzDj7LyqCMyNpSoBh/
+    user3:$apr1$Mr5A0e.U$0j39Hp5FfxRkneklXaMrr/ 
 \end{lstlisting}
 
 
-en wordt gegenereerd door Linux tools zoals htpasswd (deel van apache2-utils en httpd-tools), waarbij het paswoord van een gebruiker met MD5 wordt geëncrypteerd. In ons geval zou dit bestand dus de unieke student gebruiker bevatten, met verschillend paswoord per omgeving.
+en wordt gegenereerd door Linux tools zoals htpasswd (deel van apache2-utils en httpd-tools), waarbij het paswoord van een gebruiker met MD5 wordt geëncrypteerd. In dit geval zou dit bestand dus de unieke student gebruiker bevatten, met verschillend paswoord per omgeving.
 Optioneel kan overal een extra account voor de lesgever, met identiek paswoord voor alle omgevingen, toegevoegd worden.
 \newline
 \newline
-Als eerste onderzoek voor dit security onderdeel is er, om de configuratie van de Basic Authenticatie te bouwen, een beperkte Kubernetes yaml file gemaakt met alleen maar nginx, deze start en stopt snel tijdens het testen, maar liet al direct toe om Kubernetes Services, Port mapping en Configmap te gebruiken. Dit was ook de eerste keer dat Kubernetes werd gebruikt en dus lokaal moest geïnstalleerd worden.
+Als eerste onderzoek voor dit security onderdeel is er, om de configuratie van de Basic Authenticatie te bouwen, een beperkte Kubernetes yaml file gemaakt met alleen maar nginx, deze start en stopt snel tijdens het testen, maar liet al direct toe om Kubernetes Services, Port mapping en Configmap te gebruiken. Dit was de eerste keer dat Kubernetes werd gebruikt en dus lokaal moest geïnstalleerd worden.
 \newline
-We kozen voor Kubernetes omdat dit, zoals vermeld in vorig hoofdstuk de iets complexere oplossing is en we dat wilden zelf ondervinden. TODO
+Er is gekozen voor Kubernetes welke complexere oplossingen ondersteunt, zoals besproken in het vorige hoofdstuk.
 \newline
 \newline
 \subsubsection{Configmaps} 
 \autocite{Kubernetes2023}
 \newline
-Een ConfigMap wordt gebruikt om niet-beveiligde configuratie gegevens te beheren in sleutel-waarde formaat, en ter beschikking te stellen van de Pods en Containers, als omgevingsvariabele of als (configuratie) bestand via een volume.
+Een ConfigMap wordt gebruikt om niet-beveiligde configuratie gegevens te beheren in sleutel-waarde formaat, en ter beschikking te stellen van de pods en containers, als omgevingsvariabele of als (configuratie) bestand via een volume.
 Een ConfigMap bevat typisch de configuratie die is losgekoppeld van het Docker image om op die manier images meer generiek inzetbaar te maken \textcite{Kubernetes2023}.
 
 
-Initieel waren er hier problemen met het configureren van de volumes omdat Kubernetes volumes op een andere manier werken dan de volumes van Docker Compose, waar er eenvoudig verwezen kan worden naar lokale folders op de machine waar de container draait, terwijl bij Kubernetes alles in de Configmap gestopt wordt om op die manier van Pod te kunnen switchen of uitbreiden, en de configuratie (files) mee moet kunnen naar alle pods.
+Initieel waren er hier problemen met het configureren van de volumes omdat Kubernetes volumes op een andere manier werken dan de volumes van Docker Compose, waar er eenvoudig verwezen kan worden naar lokale folders op de machine waar de container draait, terwijl bij Kubernetes alles in de Configmap gestopt wordt om op die manier van pod te kunnen switchen of uitbreiden, en de configuratie (files) mee moet kunnen naar alle pods.
 \newline
 \newline
 In de ConfigMap werd de nginx.conf file toegevoegd en de paswoord file voor Basic Authentication.
@@ -225,62 +219,62 @@ Uiteindelijk met volgende configuratie kwam de popup voor Basic Authentication t
 Definitie van de nginx container, met verwijzen naar de nginx.conf file voor de configuratie en de password.conf file voor de definitie van gebruikers en paswoorden:
 \newline
 \begin{lstlisting}
-containers:
+    containers:
     - name: nginx
-      image: nginx:alpine
-      ports:
-        - containerPort: 443
-      volumeMounts:
-        - mountPath: /etc/nginx/nginx.conf
-          subPath: nginx.conf
-          readOnly: true
-          name: nginx-conf
-        - mountPath: /etc/nginx/password.conf
-          subPath: password.conf
-          readOnly: true
-          name: password-conf
-
-volumes:
+    image: nginx:alpine
+    ports:
+    - containerPort: 443
+    volumeMounts:
+    - mountPath: /etc/nginx/nginx.conf
+    subPath: nginx.conf
+    readOnly: true
+    name: nginx-conf
+    - mountPath: /etc/nginx/password.conf
+    subPath: password.conf
+    readOnly: true
+    name: password-conf
+    
+    volumes:
     - name: nginx-conf
-      configMap:
-        name: confnginx
-        items:
-        - key: nginx.conf
-          path: nginx.conf
+    configMap:
+    name: confnginx
+    items:
+    - key: nginx.conf
+    path: nginx.conf
     - name: password-conf
-      configMap:
-        name: confnginx
-        items:
-        - key: password.conf
-          path: password.conf
+    configMap:
+    name: confnginx
+    items:
+    - key: password.conf
+    path: password.conf
 \end{lstlisting}
 
 De nginx.conf file:
 \begin{lstlisting}
-kind: ConfigMap
-metadata:
+    kind: ConfigMap
+    metadata:
     name: confnginx
-data:
+    data:
     nginx.conf: |
-...
-        http {
-            ...
-
-            server {
-                listen 80;
-                listen [::]:80;
-                server_name         www.hadoop.local;
-                
-                auth_basic "Access restricted";
-                auth_basic_user_file /etc/nginx/password.conf;
-                ....
-                }
+    ...
+    http {
+        ...
+        
+        server {
+            listen 80;
+            listen [::]:80;
+            server_name         www.hadoop.local;
+            
+            auth_basic "Access restricted";
+            auth_basic_user_file /etc/nginx/password.conf;
+            ....
         }
+    }
 \end{lstlisting}
 
 De password.conf file:
 \begin{lstlisting}
-password.conf: |
+    password.conf: |
     student1:$apr1$vkkQyFui$ntgh7QAcWoci84KV79uKe0
     
 \end{lstlisting}
@@ -290,21 +284,21 @@ Merk op dat het niet de bedoeling is om manueel htpasswd uit te voeren voor de g
 
 \section{Hadoop}
 Daarna werd Hadoop toegevoegd en de configuratie voor nginx om als Reverse Proxy gebruikt te worden voor Hadoop. Hierbij is vertrokken van de Docker Compose file die was opgebouwd en getest in vorige stappen, en werden alle Hadoop gerelateerde configuraties toegevoegd aan de Kubernetes file. Tijdens het opstarten kwamen er een aantal problemen de voorschijn in de logs. De namenode was niet bereikbaar voor de datanode, resourcemanager en historyserver.
-In een Docker compose file worden alle containers verbonden via 1 of meerdere virtuele netwerken, en zorgt Docker ervoor dat de containers naar elkaar kunnen verwijzen door middel van de containernaam. Dit is niet het geval bij Kubernetes, waar de naam van de Pod waarop de container draait, moet worden gebruikt. Aangezien in onze oplossing alle containers voor 1 student op dezelfde Pod draaien kunnen we ook 'localhost' gebruiken.\newline
+In een Docker compose file worden alle containers verbonden via \'e\'en of meerdere virtuele netwerken, en zorgt Docker ervoor dat de containers naar elkaar kunnen verwijzen door middel van de containernaam. Dit is niet het geval bij Kubernetes, waar de naam van de pod waarop de container draait, moet worden gebruikt. Aangezien in onze oplossing alle containers voor \'e\'en student op dezelfde pod draaien kunnen we ook 'localhost' gebruiken.\newline
 In de configuratie voor Kubernetes moesten dus bij alle containers de verwijzingen naar andere containers (hostnamen) vervangen worden door 'localhost'.
 \newline
 \newline
-Om de configuratie van Hadoop aan te passen zijn er 2 manieren, ofwel gebruikmakende van environment variabelen gedefinieerd rechtstreeks op de container ofwel met environment variabelen gedefinieerd in een aparte ConfigMap. Typisch worden beiden gebruikt, in de ConfigMap stoppen we variabelen die voor alles containers gelijk zijn, en waar alle containers naar verwijzen zodat dit maar op 1 plaats gewijzigd dient te worden, en de variabelen die specifiek zijn voor elke container worden daar aan toegevoegd. Een voorbeeld van de laatste soort is SERVICE\_PRECONDITION die een manier is om te bepalen op welke andere containers moet gewacht worden. Dit is een mechanisme van Apache, waarbij een specifieke applicatie wacht met opstarten tot het contact krijgt met die andere applicatie.
+Om de configuratie van Hadoop aan te passen zijn er 2 manieren, ofwel gebruikmakende van environment variabelen gedefinieerd rechtstreeks op de container ofwel met environment variabelen gedefinieerd in een aparte ConfigMap. Typisch worden beiden gebruikt, in de ConfigMap stoppen we variabelen die voor alles containers gelijk zijn, en waar alle containers naar verwijzen zodat dit maar op \'e\'en plaats gewijzigd dient te worden, en de variabelen die specifiek zijn voor elke container worden daar aan toegevoegd. Een voorbeeld van de laatste soort is SERVICE\_PRECONDITION die een manier is om te bepalen op welke andere containers moet gewacht worden. Dit is een mechanisme van Apache, waarbij een specifieke applicatie wacht met opstarten tot het contact krijgt met die andere applicatie.
 \newline
 \newline
 Eens Hadoop werkende in Kubernetes, werd de reverse proxy configuratie van nginx aangepakt. Eerst door een Hadoop context toe te voegen aan de URL, bv http://localhost/hadoop, en die dan via de nginx proxy\_pass door te sturen naar Hadoop, met volgende configuratie:
 \newline
 \newline
 \begin{lstlisting}
-location /hadoop/ {
-    rewrite ^/hadoop/(.*)$ /$1 break;
-    proxy_pass http://hadoop:3000;
-}
+    location /hadoop/ {
+        rewrite ^/hadoop/(.*)$ /$1 break;
+        proxy_pass http://hadoop:3000;
+    }
 \end{lstlisting}
 
 Daarbij trad volgend probleem op:
@@ -331,23 +325,23 @@ De reverse proxy configuratie moest ook aangepast worden omdat het niet langer o
 \newline
 \newline
 \begin{lstlisting}
-server {
-    listen 80;
-    listen [::]:80;
-    server_name www.hadoop.local;
-}
+    server {
+        listen 80;
+        listen [::]:80;
+        server_name www.hadoop.local;
+    }
 \end{lstlisting}
 
 Bij surfen in de browser naar http://www.hadoop.local, kwam er nu eerst de user/paswoord popup en pas na invullen van de correcte gegevens kwam de WebUI van Hadoop.
 
 \section{HTTPS/SSL}
-Om de installatie veiliger te maken is er beslist om HTTPS op te zetten. Het is voldoende om dit op nginx te configureren want dat is de enige server en communicatie die van buitenaf zichtbaar is en dus mogelijk kan bespioneerd worden. Het opzetten van SSL op een aparte server, nginx in dit geval, noemt men 'SSL off-loading'.
+Om de installatie veiliger te maken is er beslist om HTTPS op te zetten. Het is voldoende om dit op nginx te configureren want dat is de enige server en enige communicatie die van buitenaf zichtbaar is en dus mogelijk kan bespioneerd worden. Het opzetten van SSL op een aparte server, nginx in dit geval, noemt men 'SSL off-loading'.
 \newline
 Er zijn nog een aantal voordelen dat dit enkel op de nginx server moet gebeuren:
 \newline
 \begin{itemize}
     \item Performantie: SSL maakt zwaar gebruik van de CPU en op deze manier worden de andere containers hiermee niet belast.
-    \item Certificaat beheer: installatie en onderhoud van de certificaten moet maar op 1 plaats gebeuren.
+    \item Certificaat beheer: installatie en onderhoud van de certificaten moet maar op \'e\'en plaats gebeuren.
     \item SSL software patching: indien kwetsbaarheden ontdekt worden in de SSL software moet de installatie van security patches enkel op de nginx gebeuren, eenvoudig door naar een nieuw image te verwijzen.
 \end{itemize}
 
@@ -373,44 +367,44 @@ Op het VIC wordt nginx al als reverse proxy gebruikt, deze zou de aparte nginx r
 \newline
 Definitie van de nginx container, met verwijzen naar de ssl files:
 \begin{lstlisting}
-containers:
+    containers:
     - name: nginx
-      image: nginx:alpine
-      ports:
-        - containerPort: 443
-      volumeMounts:
-        ...
-        - mountPath: /etc/nginx/ssl/
-            readOnly: true
-            name: nginx-secret-volume
+    image: nginx:alpine
+    ports:
+    - containerPort: 443
+    volumeMounts:
+    ...
+    - mountPath: /etc/nginx/ssl/
+    readOnly: true
+    name: nginx-secret-volume
 \end{lstlisting}
 
 De nginx.conf file:
 \begin{lstlisting}
-server {
-    listen              443 ssl;
-    server_name         www.hadoop.local;
-    ssl_certificate     /etc/nginx/ssl/tls.crt;
-    ssl_certificate_key /etc/nginx/ssl/tls.key;
-    
-    location / {
-        proxy_pass ...
+    server {
+        listen              443 ssl;
+        server_name         www.hadoop.local;
+        ssl_certificate     /etc/nginx/ssl/tls.crt;
+        ssl_certificate_key /etc/nginx/ssl/tls.key;
+        
+        location / {
+            proxy_pass ...
+        }
     }
-}
 \end{lstlisting}
 
 De nginx.conf file:
 \begin{lstlisting}
-volumes:
-- name: nginx-secret-volume
-  secret:
+    volumes:
+    - name: nginx-secret-volume
+    secret:
     secretName: nginxsecret
 \end{lstlisting}
 
 
 De SSL certificaten worden aan een Kubernetes tls secret toegevoegd als volgt:
 \begin{lstlisting}
-kubectl create secret tls nginxsecret --key certificates/nginx-selfsigned.key --cert certificates/nginx-selfsigned.crt
+    kubectl create secret tls nginxsecret --key certificates/nginx-selfsigned.key --cert certificates/nginx-selfsigned.crt
 \end{lstlisting}
 
 \section{Spark}
@@ -427,7 +421,7 @@ Spark heeft daar geen oplossing voor maar uiteindelijk bleek dat de Spark proces
 \newline
 Net zoals bij Hadoop werd dan bij nginx een servernaam geconfigureerd voor de reverse proxy, en de naam lokaal toegevoegd aan de hosts file:
 \begin{lstlisting}
-127.0.0.1 www.spark.local
+    127.0.0.1 www.spark.local
 \end{lstlisting}
 
 Wie daarna in de browser naar https://www.spark.local ging, kreeg eerst de user/paswoord popup en na invullen van de correcte gegevens zag die de WebUI van Spark.
@@ -438,39 +432,105 @@ Als laatste werden Kafka en Zookeeper opgezet in een Kubernetes configuratie. Oo
 Dit is nog een verschil met Docker Compose, namelijk de containers in een Compose bestand kunnen vrij met elkaar communiceren over alle poorten, de poorten die in een Compose gedefinieerd worden zijn de poorten die van buitenaf toegankelijk moeten zijn. Bij Kubernetes moeten alle nodige poorten ook op elke container opengezet worden via configuratie.
 \newline
 \newline
-Als voorbeeld was er vertrokken van een configuratie met 3 Kafka brokers maar dit werd te zwaar voor de laptop in combinatie met alles van Kubernetes. Bij wijzigen van configuratie en herstarten van containers ging de Disk usage regelmatig naar 100\% en moest de laptop herstart worden. Voor het testen van de configuratie van Kafka security was 1 broker voldoende dus is er verdergewerkt met een opzet met 1 Kafka broker en 1 Zookeeper. 
+Als voorbeeld was er vertrokken van een configuratie met 3 Kafka brokers maar dit werd te zwaar voor de laptop in combinatie met alles van Kubernetes. Bij wijzigen van configuratie en herstarten van containers ging de Disk usage regelmatig naar 100\% en moest de laptop herstart worden. Voor het testen van de configuratie van Kafka security was \'e\'en broker voldoende dus is er verdergewerkt met een opzet met \'e\'en Kafka broker en \'e\'en Zookeeper. 
 \newline
 Kafka ondersteunt meerdere beveiligingsmechanismes waaronder SASL/PLAIN, een eenvoudige authenticatie gebaseerd op gebruikersnamen en paswoorden in een bestand. Dit is in combinatie met SSL voldoende voor onze aanpak.
 \newline
 Dit werd opgezet in een ConfigMap en toegevoegd aan de configuratie van Kafka en Zookeeper als volgt:
 \newline
 \newline
+Acl: Access-control list
+\newline
+https://kafka.apache.org/documentation.html
+\newline
+Kafka server.properties:
+Line 2: Security protocol used to communicate between brokers. Valid values are: PLAINTEXT, SSL, SASL\_PLAINTEXT, SASL\_SSL. It is an error to set this and inter.broker.listener.name properties at the same time.
+Line 3: SASL mechanism used for inter-broker communication. Default is GSSAPI.
+Line 4: The list of SASL mechanisms enabled in the Kafka server. The list may contain any mechanism for which a security provider is available. Only GSSAPI is enabled by default.
+Line 6: The fully qualified name of a class that implements org.apache.kafka.server.authorizer.Authorizer interface, which is used by the broker for authorization.
+Line 7: if a resource has no associated ACLs, then no one is allowed to access that resource except super users. If you want to change that behavior, you can include the following in server.properties
+Line 8: Enable auto creation of topic on the server
+Line 9: Listener List - Comma-separated list of URIs we will listen on and the listener names. If the listener name is not a security protocol, listener.security.protocol.map must also be set.
+Listener names and port numbers must be unique.
+Specify hostname as 0.0.0.0 to bind to all interfaces.
+Leave hostname empty to bind to default interface.
+Examples of legal listener lists:
+PLAINTEXT://myhost:9092,SSL://:9091
+CLIENT://0.0.0.0:9092,REPLICATION://localhost:9093
+Line 10:Listeners to publish to ZooKeeper for clients to use, if different than the listeners config property. In IaaS environments, this may need to be different from the interface to which the broker binds. If this is not set, the value for listeners will be used. Unlike listeners, it is not valid to advertise the 0.0.0.0 meta-address.
+Also unlike listeners, there can be duplicated ports in this property, so that one listener can be configured to advertise another listener's address. This can be useful in some cases where external load balancers are used.
+Line 12: ?
+Line 13: Specifies the ZooKeeper connection string in the form hostname:port where host and port are the host and port of a ZooKeeper server. To allow connecting through other ZooKeeper nodes when that ZooKeeper machine is down you can also specify multiple hosts in the form hostname1:port1,hostname2:port2,hostname3:port3.
+The server can also have a ZooKeeper chroot path as part of its ZooKeeper connection string which puts its data under some path in the global ZooKeeper namespace. For example to give a chroot path of /chroot/path you would give the connection string as hostname1:port1,hostname2:port2,hostname3:port3/chroot/path.
+
+Kafka consumer.properties:
+Line 2: Protocol used to communicate with brokers. Valid values are: PLAINTEXT, SSL, SASL\_PLAINTEXT, SASL\_SSL.
+Line 3: SASL mechanism used for client connections. This may be any mechanism for which a security provider is available. GSSAPI is the default mechanism.
+Line 4: Specifies the ZooKeeper connection string in the form hostname:port where host and port are the host and port of a ZooKeeper server. To allow connecting through other ZooKeeper nodes when that ZooKeeper machine is down you can also specify multiple hosts in the form hostname1:port1,hostname2:port2,hostname3:port3.
+The server can also have a ZooKeeper chroot path as part of its ZooKeeper connection string which puts its data under some path in the global ZooKeeper namespace. For example to give a chroot path of /chroot/path you would give the connection string as hostname1:port1,hostname2:port2,hostname3:port3/chroot/path.
+
+Kafka producer.properties:
+Line 2: SASL mechanism used for client connections. This may be any mechanism for which a security provider is available. GSSAPI is the default mechanism.
+Line 3: Protocol used to communicate with brokers. Valid values are: PLAINTEXT, SSL, SASL\_PLAINTEXT, SASL\_SSL.
+Line 4: JAAS login context parameters for SASL connections in the format used by JAAS configuration files. JAAS configuration file format is described here. The format for the value is: loginModuleClass controlFlag (optionName=optionValue)*;. For brokers, the config must be prefixed with listener prefix and SASL mechanism name in lower-case. For example, listener.name.sasl\_ssl.scram-sha-256.sasl.jaas.config=com.example.ScramLoginModule required;
+Line 5: username
+Line 6: password
+Line 7: A list of host/port pairs to use for establishing the initial connection to the Kafka cluster. The client will make use of all servers irrespective of which servers are specified here for bootstrapping—this list only impacts the initial hosts used to discover the full set of servers. This list should be in the form host1:port1,host2:port2,.... Since these servers are just used for the initial connection to discover the full cluster membership (which may change dynamically), this list need not contain the full set of servers (you may want more than one, though, in case a server is down).
+
+Zookeeper zookeeper.properties:
+Line 2: ?
+Line 3: ?
+Line 4: ?
+Line 5: ?
+
+Zookeeper zookeeper\_jaas.conf:
+Line 3: ?
+Line 4:
+Line 5:
+Line 6:
+Line 7:
+
+Line 9:
+Line 10:
+Line 11:
+
+
+Kafka kafka\_server\_jaas.conf:
+Line 3: ?
+Line 4:
+Line 5:
+Line 6:
+
+Line 9:
+Line 10:
+Line 11:
+
 Kafka properties:
 \begin{lstlisting}
-  server.properties: |
+    server.properties: |
     security.inter.broker.protocol=SASL_PLAINTEXT # Security mechanisme
     sasl.mechanism.inter.broker.protocol=PLAIN  # Security mechanisme
     sasl.enabled.mechanisms=PLAIN
-
+    
     authorizer.class.name=kafka.security.auth.SimpleAclAuthorizer
     allow.everyone.if.no.acl.found=true
     auto.create.topics.enable=false
     listeners=SASL_PLAINTEXT://localhost:9092  # Protocol SASL_PLAINTEXT
     advertised.listeners=SASL_PLAINTEXT://localhost:9092 # Protocol SASL_PLAINTEXT
-
+    
     advertised.host.name=localhost
     zookeeper.connect=localhost:2181
 \end{lstlisting}
 
 \begin{lstlisting}
-  consumer.properties: |
+    consumer.properties: |
     security.protocol=SASL_PLAINTEXT
     sasl.mechanism=PLAIN
     zookeeper.connect=localhost:2181
 \end{lstlisting}
 
 \begin{lstlisting}
-  producer.properties: |
+    producer.properties: |
     sasl.mechanism=PLAIN
     security.protocol=SASL_PLAINTEXT
     sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required
@@ -482,48 +542,54 @@ Kafka properties:
 Zookeeper configuratie:
 \begin{lstlisting}
     zookeeper.properties: |
-      authProvider.1=org.apache.zookeeper.server.auth.SASLAuthenticationProvider
-      requireClientAuthScheme=sasl
-      jaasLoginRenew=3600000
-      clientPort=2181
+    authProvider.1=org.apache.zookeeper.server.auth.SASLAuthenticationProvider
+    requireClientAuthScheme=sasl
+    jaasLoginRenew=3600000
+    clientPort=2181
 \end{lstlisting}
-  
+
 \begin{lstlisting}
-  zookeeper_jaas.conf: |
+    zookeeper_jaas.conf: |
     Server {
-      org.apache.kafka.common.security.plain.PlainLoginModule required
-      username="admin"
-      password="admin-secret"
-      user_admin="admin-secret";
+        org.apache.kafka.common.security.plain.PlainLoginModule required
+        username="admin"
+        password="admin-secret"
+        user_admin="admin-secret";
     };
     Client {
-      org.apache.zookeeper.server.auth.DigestLoginModule required
-      username="admin"
-      password="admin-secret";
+        org.apache.zookeeper.server.auth.DigestLoginModule required
+        username="admin"
+        password="admin-secret";
     };
 \end{lstlisting}
 
 Configuratie van de gebruikers:
 \begin{lstlisting}
-  kafka_server_jaas.conf: |
+    kafka_server_jaas.conf: |
     KafkaServer {
-       org.apache.kafka.common.security.plain.PlainLoginModule required
-       username="admin"
-       password="admin-secret"
-       user_admin="admin-secret";
+        org.apache.kafka.common.security.plain.PlainLoginModule required
+        username="admin"
+        password="admin-secret"
+        user_admin="admin-secret";
     };
-
+    
     Client {
-       org.apache.kafka.common.security.plain.PlainLoginModule required
-       username="admin"
-       password="admin-secret";
+        org.apache.kafka.common.security.plain.PlainLoginModule required
+        username="admin"
+        password="admin-secret";
     };
 \end{lstlisting}
 
-Na deze wijziging moest het Producer voorbeeld uit de oefeningen de juiste credentials doorgeven aan Kafka anders werd het geweigerd.
+Na deze wijziging moest het Kafka producer voorbeeld uit de oefeningen de juiste credentials doorgeven aan Kafka anders werd het geweigerd.
 
-\section{Geheugen gebruik van de oplossing} TODO command om resoruce te zien toevoegen ``docker stats''
-De volgende screenshots (figuren 3.3, 3.4, 3.5 en 3.6) zijn gemaakt na deployment van de Hadoop omgeving in 1 Pod en in 2 Pods. Elke Pod gebruikt ongeveer evenveel geheugen, dus voor elke student omgeving komt hetzelfde geheugengebruik, zon'n 750 MB, erbij.
+\section{Geheugen gebruik van de oplossing}
+De volgende screenshots (figuren 3.3, 3.4, 3.5 en 3.6) zijn gemaakt na deployment van de Hadoop omgeving in 1 pod en in 2 pods. Daarvoor werd het volgende commando uitgevoerd:
+\begin{lstlisting}
+    docker stats
+\end{lstlisting}
+
+
+Elke pod gebruikt ongeveer evenveel geheugen, dus voor elke student omgeving komt hetzelfde geheugengebruik, zon'n 750 MB, erbij.
 
 \begin{figure}[H]
     \includegraphics[scale=0.6]{Hadoop resource usage.png}
@@ -547,11 +613,10 @@ Volgende screenshot is voor 1 Kafka omgeving. Opnieuw veel beperkter gebruik in 
     \caption{Resources gebruik - 1 omgeving met Kafka.}
 \end{figure}
 
-Hadoop heeft dus duidelijk de grootste invloed en alles bij elkaar genomen is de omgeving zelf, voor 1 student, toch wel resource intensief. Dit is onafhankelijk van de resources nodig voor Kubernetes en zou dus hetzelfde resultaat geven bij gebruik van Docker Compose of Swarm.
+Hadoop heeft dus duidelijk de grootste invloed en alles bij elkaar genomen is de omgeving zelf, voor \'e\'en student, toch wel resource intensief. Dit is onafhankelijk van de resources nodig voor Kubernetes en zou dus hetzelfde resultaat geven bij gebruik van Docker Compose of Swarm.
 \newline
-Dit is ook het verwachte minimale geheugengebruik, afhankelijk van de verwerkingsapplicaties en de data sets zal daar nog bijkomen.
+Dit is trouwens het verwachte minimale geheugengebruik, afhankelijk van de verwerkingsapplicaties en de data sets zal daar nog bijkomen.
 \newline
-
-TODO Nog aan het wachten op info van de op het VIC beschikbare resources, mail van 18/05, om te vergelijken.
-
+Het VIC beheert PowerEdge M640 en PowerEdge R640 servers (CPU: 16 cores/32 threads @ 2.10GHz, RAM: 192.0 GB), dus zou vermoedelijk onze oplossing, die wat geheugengebruik betreft naar de 60 GB gaat, wel aankunnen.
+Maar dan zou een groot deel van de resources van het VIC ingenomen worden, enkel door deze oplossing. Dit is niet in verhouding tot wat de oplossing biedt, aan 60 studenten voor \'e\'en vak, dus moet de piste van de gedeelde omgeving ook onderzocht worden.
 

@@ -16,7 +16,7 @@
 
 %\lipsum[7-20]
 
-Het doel van dit onderzoek is meer inzicht te verschaffen in het gebruik van containertechnologie, toegepast op installatie van Hadoop, Spark en Kafka, om de software die nodig is voor het vak Big Data Processing aan HOGENT zoveel mogelijk te automatiseren.
+Het doel van dit onderzoek is meer inzicht te verschaffen in het gebruik van container technologie, toegepast op installatie van Hadoop, Spark en Kafka, om de software die nodig is voor het vak Big Data Processing aan HOGENT zoveel mogelijk te automatiseren.
 \newline
 Meer concreet worden tijdens deze oefeningen de applicaties Hadoop, Spark en Kafka geïnstalleerd tijdens de les. Lestijd die beter kan besteed worden aan bijvoorbeeld het gebruik van de applicaties.
 \newline
@@ -29,19 +29,19 @@ Gezien het doel van deze studie is om te komen tot inzichten en aanbevelingen vo
 \newline
 
 \section{Container technologie}
-Een container biedt een omgeving waarbinnen één of meerdere applicaties draaien. Container technologie gebruikt de TODO virtualisatie mogelijkheden van het Operating Systeem om meerdere containers geïsoleerd van elkaar te draaien binnen 1 machine. Daarbij wordt de kernel van het Operating Systeem van de machine gedeeld door alle containers.
+Een container biedt een omgeving waarbinnen één of meerdere applicaties draaien. Container technologie gebruikt de virtualisatiemogelijkheden van het Operating Systeem om meerdere containers geïsoleerd van elkaar te draaien binnen \'e\'en machine. Daarbij wordt de kernel van het Operating Systeem van de machine gedeeld door alle containers.
 \newline
 Dit is in tegenstelling tot virtuele machines, waar telkens een volledige `virtuele computer` wordt gebruikt, inclusief het Operating Systeem. Hierdoor zijn containers veel kleiner, zowel wat disk space als geheugen betreft.
 \newline
 Merk op dat de machine waarbinnen de containers draaien zowel een fysieke als een virtuele machine kan zijn.
 \newline
-Twee typische voorbeelden van container technologie zijn LXC (LinuX Containers) en Docker. TODO Referentie
+Volgens \textcite{Moravcik2020} zijn LXC (LinuX Containers) en Docker de twee meest gebruikte container technologieën.
 \newline
-LXC draait enkel op Linux en biedt een container die in essentie een blanco Linux omgeving is, waarbinnen dan 1 of meerdere applicaties worden geïnstalleerd. Als Linux omgeving is er zeer veel flexibiliteit maar daaraan gekoppeld ook meer complexiteit.
+LXC draait enkel op Linux en biedt een container die in essentie een blanco Linux omgeving is, waarbinnen dan \'e\'en of meerdere applicaties worden geïnstalleerd. Als Linux omgeving is er zeer veel flexibiliteit maar daaraan gekoppeld ook meer complexiteit.
 \newline
 Docker heeft aan containers een aantal functionaliteiten toegevoegd zoals abstractie van opslag en netwerk, en het concept van 'image' dat beter is ondersteund en effiënter qua disk space. Een image bevat al het nodige om een applicatie te kunnen draaien (code, ondersteunende software bijvoorbeeld Java Virtual Machine, scripts, configuratie), dit laat toe om een Docker container eenvoudig op te zetten gebaseerd op voorgedefinieerde images.
 \newline
-Een essentieel verschil met LXC containers is dat Docker containers 'single-process' zijn. Dit betekent dat ze 1 enkel proces draaien. Vandaar ook de typische aanpak van Docker images waarbij elk image 1 enkele applicatie bevat, inclusief de ondersteunende software en de bijhorende configuratie. Dat maakt dat een Docker image telkens gelinkt is aan 1 oplossing.
+Een essentieel verschil met LXC containers is dat Docker containers 'single-process' zijn. Dit betekent dat ze \'e\'en enkel proces draaien. Vandaar ook de typische aanpak van Docker images waarbij elk image \'e\'en enkele applicatie bevat, inclusief de ondersteunende software en de bijhorende configuratie. Dat maakt dat een Docker image telkens gelinkt is aan \'e\'en oplossing.
 \newline
 \begin{figure}[H]
     \includegraphics[scale=0.8]{LXC vs Docker.png}
@@ -52,15 +52,13 @@ Uitgevers van software, zowel Open Source als commerciële software, stellen dik
 \newline
 Voor developers is het voordeel dat ze snel een lokale omgeving kunnen opstaren, van een bepaalde versie van een oplossing, bijvoorbeeld MySQL, nginx, enz. Voor het ene project is MySQL versie 5.x nodig, voor een ander project MySQL 8.x, hiervoor moet de development omgeving niet telkens gewijzigd worden, per project wordt de ondersteunende software via containers gestart.
 \newline
-Als onderdeel van een CI/CD pipeline worden images gebouwd en daarna van Test naar Acceptatie naar Productie omgeving gebracht, hetzelfde ongewijzigde image dus minder kans op fouten tijdens installatie. Bij containers gebeurt de bouw van de image geautomatiseerd 1 keer. Daarna is het de image die alle omgevingen doorloopt.
+Als onderdeel van een CI/CD pipeline worden images gebouwd en daarna van Test naar Acceptatie naar Productie omgeving gebracht, hetzelfde ongewijzigde image dus minder kans op fouten tijdens installatie. Bij containers gebeurt de bouw van de image geautomatiseerd \'e\'en keer. Daarna is het de image die alle omgevingen doorloopt.
 \newline
-In grootschalige cloud-omgevingen is het voordeel van image gebaseerde containers dat bijkomende containers opstarten veel eenvoudiger is. Hiervoor zijn intussen ook al oplossingen gegroeid zoals Kubernets zie verder.
+In grootschalige cloud-omgevingen is het voordeel van image gebaseerde containers dat bijkomende containers opstarten veel eenvoudiger is. Hiervoor zijn intussen ook al oplossingen gegroeid zoals Kubernetes, zie verder.
 \newline
-In de eerste versies maakte Docker gebruik van LXC, voor de virtualisatie functionaliteiten, maar in recentere versies is er een eigen onderliggende technologie gebouwd als virtualisatie laag, die vooral kon steunen op het concept dat er maar 1 applicatie per container draait. 
+In de eerste versies maakte Docker gebruik van LXC, voor de virtualisatie functionaliteiten, maar in recentere versies is er een eigen onderliggende technologie gebouwd als virtualisatie laag, die vooral kon steunen op het concept dat er maar \'e\'en applicatie per container draait. 
 \newline
-\newline
-
-Voor een nog meer gedetailleerde vergelijking verwijzen we naar \textcite{Tunggal2023}.
+Voor een nog meer gedetailleerde vergelijking zie \textcite{Tunggal2023}.
 
 \subsubsection{Docker Image opbouw en structuur}
 Docker images gebruiken een `parent` image, bijvoorbeeld een basis Linux container image, waaraan dan op basis van de Dockerfile (een tekst file met opeenvolgende commandos) software wordt toegevoegd. De nieuwe image verwijst naar de parent image, maar bevat deze niet. Er wordt een `laag` aangemaakt die dan samen met de parent image kan uitgevoerd worden. Samen vormen ze de nieuwe image.
@@ -81,21 +79,23 @@ De meeste van die zaken zijn allemaal ook manueel te verwezenlijken met meerdere
 \newline
 
 \subsection{Container technologie conclusie}
-Als containertechnologie is Docker gekozen voor de volgende redenen:
+Als container technologie is Docker gekozen voor de volgende redenen:
 \newline
 \begin{itemize}
-    \item Het is vandaag de meest gebruikte container TODO (bewijs) technologie en wordt ondersteund door grote bedrijven zoals Red Hat, Canonical, Oracle, Microsoft en Google. Exacte en onafhankelijke cijfers die de populariteit van containertechnologie vergelijken zijn niet gevonden, maar het is wel tekenend dat bij herhaaldeljk zoeken naar container technologie je altijd resultaten krijgt voorgesteld die over Docker gaan.
+    \item Volgens de ``2020 Developer Survey'' \autocite{Stackoverflow2020}, beantwoord door 65000 respondenten, is Docker de meest populaire container technologie, het is zelfs het meest geliefde platform na Linux en Windows.
+    \newline
+    Het wordt ondersteund door grote bedrijven zoals Red Hat, Canonical, Oracle, Microsoft en Google. Exacte en onafhankelijke cijfers die de populariteit van container technologie vergelijken zijn niet gevonden, maar het is wel tekenend dat bij herhaaldeljk zoeken naar container technologie je altijd resultaten krijgt voorgesteld die over Docker gaan.
     \item De VIC omgeving: Docker en Docker Compose worden vandaag al gebruikt in het VIC (zie verder).
-    \item De 3 Big Data applicaties zijn ieder apart beschikbaar als Docker container image en moeten dus niet meer zelf gebouwd of geïnstalleerd worden. Met de images kunnen TODO we direct aan de slag om combinaties op te zetten, en via configuratie aan te passen aan de vereisten.
+    \item De 3 Big Data applicaties zijn ieder apart beschikbaar als Docker container image en moeten dus niet meer zelf gebouwd of geïnstalleerd worden. Images laten toe om direct de combinaties op te zetten, en via configuratie aan de vereisten aan te passen.
     \item Hadoop heeft YARN als resource manager (zie verder) en deze kan Docker gebruiken om zelf containers te starten. In dit geval draaien er bijvoorbeeld meerdere machines een Hadoop nodemanager en kan YARN op elk van deze machines meerdere containers opstarten. YARN en Hadoop worden verder nog besproken \autocite{Hadoop2023a}.
 \end{itemize}
 
-De voorgestelde oplossing zou kunnen bestaan uit meerdere docker-compose files, telkens voor één van de Big Data applicaties of een combinatie ervan. Zoals ook verder beschreven bestaat elke applicatie uit meerdere processen die elk in één container kunnen draaien. Dit zullen we verder moeten uitzoeken.
+De voorgestelde oplossing zou kunnen bestaan uit meerdere docker-compose files, telkens voor één van de Big Data applicaties of een combinatie ervan. Zoals ook verder beschreven bestaat elke applicatie uit meerdere processen die elk in één container kunnen draaien. Dit moet verder uitgezocht worden.
 \newline
 \newline
 
 \subsection{Docker en containerd}
-Om het voorgaande enigzins overzichtelijk te houden, en ook om historische redenen want ``docker'' was de eerste tool van Docker, spraken we over ``Docker'' containers als overkoepelende benaming van alle functionaliteit die geboden wordt maar er zit intussen veel meer achter dan enkel de docker tool, die nu is hernoemd naar Docker Desktop (voor Developers op Windows, Mac en Linux) en Docker Engine (voor servers op Linux).
+Om het voorgaande enigzins overzichtelijk te houden, en ook om historische redenen want ``docker'' was de eerste tool van Docker, wordt er gesproken over ``Docker'' containers als overkoepelende benaming van alle functionaliteit die geboden wordt maar er zit intussen veel meer achter dan enkel de docker tool, die nu is hernoemd naar Docker Desktop (voor ontwikkelaars op Windows, Mac en Linux) en Docker Engine (voor servers op Linux).
 De Docker Engine bestaat uit de Docker daemon, die draait in de achtergrond en containers beheert, en de docker-cli tool, die toelaat om via command-line instructies te geven aan de Docker Daemon.
 De Docker Daemon gebruikt zelf dan weer ``containerd'', een daemon en container runtime die gestandardiseerd en onafhankelijk (afgesplitst) is van Docker. Het zou ons te ver leiden om hier dieper op in te gaan maar 2 punten zijn van belang om te onthouden:
 \begin{itemize}
@@ -107,11 +107,11 @@ Een goede introductie tot dit alles is te vinden in \textcite{Donohue2023}.
 
 
 \subsection{Cluster}
-Een cluster is een groep van computers, clusternodes genaamd, die samenwerken en zich naar de gebruiker toe als 1 enkel systeem gedragen. Het concept van een cluster is dat het werk wordt verdeeld over de verschillende nodes.
+Een cluster is een groep van computers, clusternodes genaamd, die samenwerken en zich naar de gebruiker toe als \'e\'en enkel systeem gedragen. Het concept van een cluster is dat het werk wordt verdeeld over de verschillende nodes.
 Dit heeft meerdere voordelen:
 \newline
 \begin{itemize}
-    \item Door de architectuur van samenwerking kan een cluster eenvoudig en in theorie ongelimiteerd uitgebreid worden met bijkomende nodes, in tegenstelling tot oplossingen die slechts op 1 enkele machine draaien en die dan beperkt worden door de fysieke limieten van de machine (Scalability).
+    \item Door de architectuur van samenwerking kan een cluster eenvoudig en in theorie ongelimiteerd uitgebreid worden met bijkomende nodes, in tegenstelling tot oplossingen die slechts op \'e\'en enkele machine draaien en die dan beperkt worden door de fysieke limieten van de machine (Scalability).
     \item Bij de meeste applicaties is de belasting niet continu dezelfde en een cluster architectuur laat toe om, volgens de actuele vraag, bijkomende nodes op te starten en later terug af te sluiten. Dit spaart resources en maakt nodes ook beschikbaar voor andere applicaties.
     \item Instabiele nodes kunnen worden herstart zonder dat de gebruiker er iets van merkt (Stability; Availability).
 \end{itemize}
@@ -121,11 +121,10 @@ Volgens \textcite{Docker2023b} worden bij een Docker cluster, ook Docker Swarm g
 \newline
 \newline
 Docker Swarm is dus een mogelijkheid voor de installatie en het beheer van Big Data oplossingen.
-\newline
-\newline
+
 
 \subsection{Kubernetes}
-Kubernetes, of K8s, is een open-source container oplossing ontworpen door Google. Het wordt gebruikt om groepen of clusters van applicaties binnen containers te beheren. Dit noemen we in de IT wereld ‘orkestratie’.
+Kubernetes, of K8s, is een open-source container oplossing ontworpen door Google. Het wordt gebruikt om groepen of clusters van applicaties binnen containers te beheren. Dit wordt ‘orkestratie’ genoemd.
 \newline
 Kubernetes start en monitort containers, start extra containers indien nodig om de belasting aan te kunnen, en stopt en herstart automatisch containers die niet langer reageren \autocite{Guthrie2022}.
 \newline
@@ -154,15 +153,14 @@ De eerste Big Data oplossing die werd bekeken is Apache Hadoop. Dit is een raamw
 Hadoop is ontworpen om als cluster gebruikt te worden, met fout detectie en afhandeling ervan, en kan gaan tot duizenden machines, elk met lokale verwerking en opslag. \autocite{ASF2022}
 
 \subsection{Hadoop Distributed File System}
-Om de data te verdelen over alle nodes die deelnemen aan de Hadoop cluster wordt het Hadoop Distributed File System of HDFS gebruikt, dit heeft een \newline master/slave architectuur en laat toe om gegevens op te slaan in files die verdeeld worden over de cluster. Een cluster bestaat uit 1 master, de namenode en meerdere slaves, de datanodes. Een 2de namenode kan worden gebruikt als backup om de stabiliteit van de cluster te verzekeren.
+Om de data te verdelen over alle nodes die deelnemen aan de Hadoop cluster wordt het Hadoop Distributed File System of HDFS gebruikt, dit heeft een \newline master/slave architectuur en laat toe om gegevens op te slaan in files die verdeeld worden over de cluster. Een cluster bestaat uit \'e\'en master, de namenode en meerdere slaves, de datanodes. Een 2de namenode kan worden gebruikt als backup om de stabiliteit van de cluster te verzekeren.
 \newline
 De namenode houdt bij in welke datanodes de data zich bevinden. Meerdere kopieën van de data worden gerepliceerd over de verschillende datanodes zodat er geen data verloren gaat bij uitvallen van een datanode.
 \newline
 \newline
 Initieel was HDFS bedoeld om een goede performantie en stabiliteit te garanderen op eerder goedkope hardware, en om het mogelijke falen hiervan op te vangen werd het ontworpen met een focus op verdeling en redundantie van de data. De ``fault-tolerance'' wordt op die manier verzekerd door de software en niet door high-end hardware.
 Door de architectuur van HDFS biedt het een goede performantie voor applicaties die nood hebben aan het verwerken van zeer grote datasets \autocite{Borthakur2007}.
-\newline
-\newline
+
 \subsection{MapReduce}
 MapReduce is een programmeermodel en framework dat deel uitmaakt van Hadoop. Het doet beroep op de kracht van het Hadoop Distributed File System om de data die verwerkt moet worden te verdelen over grote aantallen nodes en daar parallel te verwerken \autocite{Talend2023}.
 
@@ -183,20 +181,20 @@ De volgende figuur verduidelijkt de werking van MapReduce met een voorbeeld van 
     \caption{Diagram ter verduidelijking van MapReduce \autocite{Anushkakhatri2022}.}
 \end{figure}
 
-Hadoop ondersteunt het gebruik van MapReduce programmas geschreven in programmeertalen zoals Java, Python, Ruby en C++ 
+Hadoop ondersteunt het gebruik van MapReduce programma's geschreven in programmeertalen zoals Java, Python, Ruby en C++ 
 \autocite{Taylor2023}.
 \newline
 \newline
-Hadoop wordt o.a. alleenstaand gebruikt tijdens de oefeningen Big Data Processing, daarvoor kunnen we bestaande Docker Compose files gebruiken die de verschillende services bevatten nodig om een Master of Slave te starten.
+Hadoop wordt o.a. alleenstaand gebruikt tijdens de oefeningen Big Data Processing, daarvoor kan de bestaande Docker Compose files gebruikt worden die de verschillende services bevatten nodig om een Master of Slave te starten.
 In de eenvoudigste vorm is er \'e\'en docker compose file die alle services opstart om te kunnen werken met \'e\'en master en \'e\'en slave.
 \newline
 \newline
-Elke service (namenode, datanode, resourcemanager) is een specifiek Docker image, waarvan er voorbeelden te vinden zijn op DockerHub, en ook van de Docker scripts die gebruikt werden om de images op te bouwen. Typisch is er een basis Hadoop image dat het volledige framework bevat, en worden daar aparte images vanaf geleid die telkens maar 1 specifiek process (namenode, datanode, ...) van Hadoop opstarten.
+Elke service (namenode, datanode, resourcemanager) is een specifiek Docker image, waarvan er voorbeelden te vinden zijn op DockerHub, en ook van de Docker scripts die gebruikt werden om de images op te bouwen. Typisch is er een basis Hadoop image dat het volledige framework bevat, en worden daar aparte images vanaf geleid die telkens maar \'e\'en specifiek process (namenode, datanode, ...) van Hadoop opstarten.
 \newline
 Door op die manier met aparte images te werken kan het beheer van de cluster buiten Hadoop worden gedaan, bijvoorbeeld in Kubernetes of Docker Swarm.
 \newline
 \newline
-In de volgende sectie gaan TODO we Apache Spark bekijken, welke functionaliteit dit toevoegt aan Hadoop en hoe TODO we dit kunnen integreren.
+In de volgende sectie wordt Apache Spark bekeken, welke functionaliteit dit toevoegt aan Hadoop en hoe dit kan geïntegreerd worden.
 \newline
 \newline
 
@@ -206,8 +204,6 @@ Apache Spark is net als Hadoop een Open Source framework bedoeld voor het verwer
 \newline
 De data in Spark wordt verdeeld opgeslagen in de cluster, in eerdere versies in RDD (Resilient Distributed Dataset), een set van data objecten in Java of Scala formaat. In nieuwere versies van Spark wordt DataFrame gebruikt, waarbij de gegevens gestructureerd worden in kolommen, gelijkaardig aan een tabel in een relationele databank. Volgende componenten zijn aanwezig in Spark om dit soort gestructureerde data te helpen verwerken: Spark SQL, Spark MLlib en Spark GraphX.
 \autocite{DataFlair2023}
-\newline
-\newline
 
 \subsection{Spark SQL, DataFrames and Datasets}
 Deze module is de meest gebruikte Spark module voor gestructureerde data verwerking en laat toe om data op te halen en te bewerken door middel van SQL APIs, DataFrame APIs en Dataset APIs, waarvoor bibliotheken beschikbaar zijn voor meerdere programmeertalen waaronder Java, Scala en Python. Voor deze laatste bestaan alleen de eerste 2 APIs, niet de Dataset APIs.
@@ -238,7 +234,7 @@ Volgens \autocite{Buuck2022} is Spark Streaming een uitbreiding van de Spark API
 Het is dit laatste onderdeel van Spark, Structured Streaming, dat typisch in combinatie met Kafka (zie verder) wordt gebruikt om data op te halen en na verwerking terug te bezorgen voor eventuele verdere stappen.
 \newline
 \newline
-Terugkomend op ons doel van Spark in containers te draaien: er zijn Spark Docker images beschikbaar die toelaten zowel een Spark Master als een Spark Worker te starten.
+Terugkomend op het doel van Spark in containers te draaien: er zijn Spark Docker images beschikbaar die toelaten zowel een Spark Master als een Spark Worker te starten.
 
 
 \section{Kafka}
@@ -253,11 +249,11 @@ De belangrijkste taak van een broker is het ontvangen en opslaan van Records.
 \subsection{Een Event of Kafka record}
 Een event is een boodschap die doorgeeft dat er ``iets'' is gebeurd, van belang voor de applicatie die wordt gebouwd. Deze boodschap bevat informatie over datgene dat is gebeurd en bevat een tijdstip, een sleutel, specifieke waardes en eventuele bijkomende metadata. Een voorbeeld uit de bankwereld van zo'n event is ``Piet Peeters'' ``heeft een betaling van 123Euro gedaan aan Jan Janssens'' op ``10/02/2023 om 11:35''.
 \newline
-In de terminologie van Kafka worden events gestuurd door ``Producers'' naar Kafka, waar ze worden opgeslagen en daarna kunnen worden opgevraagd door ``Consumers''. Doordat beiden enkel via Kafka communiceren zijn ze van elkaar losgekoppeld en is dus de producer niet afhankelijk van de beschikbaarheid van de consumer \autocite{Kafka2023}.
+In de terminologie van Kafka worden events gestuurd door ``producers'' naar Kafka, waar ze worden opgeslagen en daarna kunnen worden opgevraagd door ``consumers''. Doordat beiden enkel via Kafka communiceren zijn ze van elkaar losgekoppeld en is dus de producer niet afhankelijk van de beschikbaarheid van de consumer \autocite{Kafka2023}.
 \newline
 Daarnaast kunnen eenvoudig meerdere consumers bijgekoppeld worden zonder dat de producer hiervan op de hoogte hoeft te zijn of worden aangepast.
 \newline
-Dit wordt ook wel het ``Publish-Subscribe'' mechanisme genoemd. Er is 1 partij die events publisht en er zijn 1 of meerdere partijen die subscriben op de events van de Publisher.
+Dit wordt ook wel het ``Publish-Subscribe'' mechanisme genoemd. Er is \'e\'en partij die events publisht en er zijn \'e\'en of meerdere partijen die subscriben op de events van de Publisher.
 In de terminologie van Kafka vormt een event een record dat opgeslagen wordt.
 
 
@@ -266,11 +262,11 @@ Volgens \textcite{Harbour2023} kan een topic gezien worden als een soort logisch
 
 
 \subsection{Kafka Partition}
-Een topic bestaat uit 1 of meerdere partities. Records worden in een partitie opgeslagen door ze telkens achteraan de partitie toe te voegen. Bij het lezen van een topic/partitie ontvangen de consumers de records in dezelfde volgorde als ze gestuurd werden door de producer, dit is telkens enkel geldig bij één enkele topic/partitie. De volgorde van records die niet in eenzelfde partitie zijn opgeslagen is onbepaald.
-Meerdere partities voor 1 enkel topic dienen ter ondersteuning van de schaalbaarheid, waarbij elke partitie wordt opgeslagen op een andere broker. Op die manier kunnen topics met zeer grote volumes aan records parallel opgeslagen en verwerkt worden.
+Een topic bestaat uit \'e\'en of meerdere partities. Records worden in een partitie opgeslagen door ze telkens achteraan de partitie toe te voegen. Bij het lezen van een topic/partitie ontvangen de consumers de records in dezelfde volgorde als ze gestuurd werden door de producer, dit is telkens enkel geldig bij één enkele topic/partitie. De volgorde van records die niet in eenzelfde partitie zijn opgeslagen is onbepaald.
+Meerdere partities voor \'e\'en enkel topic dienen ter ondersteuning van de schaalbaarheid, waarbij elke partitie wordt opgeslagen op een andere broker. Op die manier kunnen topics met zeer grote volumes aan records parallel opgeslagen en verwerkt worden.
 \newline
 \newline
-Volgens \textcite{Harbour2023} speelt de sleutel van een event een belangrijke rol bij partitions. Voor het verwerken van grote volumes aan events kunnen meerdere consumers opgezet worden die ieder de events van een enkele partitie verwerken. Die consumers krijgen de events van hun partitie in de juiste volgorde binnen, maar zien niet de events op de andere partities. Terugkerend naar ons voorbeeld uit de bankwereld:
+Volgens \textcite{Harbour2023} speelt de sleutel van een event een belangrijke rol bij partitions. Voor het verwerken van grote volumes aan events kunnen meerdere consumers opgezet worden die ieder de events van een enkele partitie verwerken. Die consumers krijgen de events van hun partitie in de juiste volgorde binnen, maar zien niet de events op de andere partities. Terugkerend naar het voorbeeld uit de bankwereld:
 \begin{itemize}
     \item Producer stuurt een event dat 100 Euro op de rekening van Jan wordt gezet. Dit wordt op partitie 1 gezet.
     \item Producer stuurt een event dat 50 Euro van de rekening van Jan wordt gehaald. Dit wordt op partitie 2 gezet.
@@ -280,7 +276,7 @@ Volgens \textcite{Harbour2023} speelt de sleutel van een event een belangrijke r
 
 \begin{figure}[H]
     \includegraphics[scale=0.5]{partitions-example.png}
-    \caption{De verdeling van ons voorbeeld over 1 partitie (met sleutel) of 2 partities (zonder).}
+    \caption{De verdeling van het voorbeeld over 1 partitie (met sleutel) of 2 partities (zonder).}
 \end{figure}
 
 Om vorig scenario te vermijden worden events aan partities toegewezen op basis van de sleutel van het event. Het is dus aan de producer om de juiste sleutel te kiezen, in dit geval ``Jan'', om ervoor te zorgen dat beide events op dezelfde partitie komen en allebei in de juiste volgorde aan de consumer worden bezorgd.
@@ -297,7 +293,7 @@ Bij Apache Kafka werd Zookeeper gebruikt voor metadata beheer, bijvoorbeeld bijh
 \autocite{Conduktor2023}
 \newline
 \newline
-Afhankelijk van de versie van Kafka die we uiteindelijk zullen gebruiken kan Zookeeper wel of niet toegevoegd worden aan de oplossing.
+Afhankelijk van de versie van Kafka die wordt gebruikt kan Zookeeper wel of niet toegevoegd worden aan de oplossing.
 \newline
 \newline
 
@@ -307,7 +303,7 @@ Eén van de doelstellingen was ``Design, integrate and deploy a cloud-deployment
 \newline
 \sloppypar Op dockerhub zijn de images terug te vinden onder de bde2020 gebruiker (https://hub.docker.com/u/bde2020). Op github (https://github.com/big-data-europe) zijn alle sources te vinden van ieder image.
 \newline
-De laatste images van Spark en Hadoop zijn van vorig jaar (3.3.0) en er zijn geen images beschikbaar voor de laatste versie van Spark (3.4.0). Het is niet duidelijk of dit project nog zeer actief is. In de toekomst zullen we de images dus mogelijks zelf moeten bouwen, waarbij wel een beroep kan gedaan worden op de bestaande sources, of kijken naar andere publishers.
+De laatste images van Spark en Hadoop zijn van vorig jaar (3.3.0) en er zijn geen images beschikbaar voor de laatste versie van Spark (3.4.0). Het is niet duidelijk of dit project nog zeer actief is. In de toekomst dienen de images dus mogelijks zelf moeten gebouwd worden, waarbij wel een beroep kan gedaan worden op de bestaande sources, of kijken naar andere publishers.
 \newline
 \sloppypar Bitnami is een ``Verified Publisher'' op Dockerhub, die dus te vertrouwen is, die een onder andere een Spark image ter beschikking stelt en Apache (https://hub.docker.com/u/apache) is een gesponsorde publisher die o.a. Hadoop en Spark images aanbiedt.
 
@@ -316,11 +312,11 @@ De laatste images van Spark en Hadoop zijn van vorig jaar (3.3.0) en er zijn gee
 VIC is een ``bedrijf'' van HOGENT dat virtuele machines voorziet voor studenten, zodat bepaalde oplossingen niet op een eigen computer moeten draaien. Op aanvraag van studenten worden virtuele machine(s) opgezet en wordt er een soort van contract afgesproken met machine specs en lifespan.
 \newline
 \newline
-De infrastructuur van VIC HOGENT is gebaseerd op virtuele machines op de eigen hardware die wordt beheerd door VMware vSphere (VMware's virtualization platform) versie 8, waarvan de 2 belangrijkste onderdelen ESXi en vCenter Server zijn.
+De infrastructuur van VIC HOGENT is gebaseerd op virtuele machines op de eigen hardware die wordt beheerd door VMware vSphere (VMware's virtualization platform) versie 8, waarvan de 2 belangrijkste onderdelen ESXi en vCenter server zijn.
 \newline
-VMWare ESXi is de naam van de VMWare hypervisor en is dus het virtualisatie platform waarop virtuele machines worden uitgevoerd en vCenter Server is de service waarmee alles beheerd wordt.
+VMWare ESXi is de naam van de VMWare hypervisor en is dus het virtualisatie platform waarop virtuele machines worden uitgevoerd en vCenter server is de service waarmee alles beheerd wordt.
 \newline
-vCenter Server is een tool van VMware die toelaat toe om centraal het beheer te doen van de ESXi hosts, de virtuele machines, de netwerkinfrastructuur, de opslag en de gerelateerde componenten.
+vCenter server is een tool van VMware die toelaat toe om centraal het beheer te doen van de ESXi hosts, de virtuele machines, de netwerkinfrastructuur, de opslag en de gerelateerde componenten.
 \newline
 Volgens \textcite{VMware2023a} is een hypervisor software die op een fysieke machine draait en toelaat om op die machine meerdere virtual machines (VMs) te starten. Daartoe worden bepaalde resources van de fysieke machine, zoals geheugen, CPU en disk, gedeeld met alle virtuele machines.
 \newline
@@ -339,7 +335,7 @@ Kubernetes wordt door vSphere vooral ondersteund om ontwikkelaars te laten werke
 Daarnaast worden ook Docker containers ondersteund door VMWare vSphere, dus dit is een mogelijke oplossing zonder Kubernetes.
 \newline
 \newline
-Kubernetes wordt door vSphere ondersteund op 2 manieren: ofwel door gebruik te maken van de vSphere Pods waarbij het beheer van de Docker containers nog steeds via de traditionele vSphere Admin verloopt, die een subset van de Kubernetes configuratie ondersteunt, ofwel via de Tanzu Kubernetes cluster. Dit is software van VMWare die apart kan worden geïnstalleerd en die de Kubernetes manier van werken ondersteunt en dus ook meer controle biedt over het beheer van de Kubernetes cluster.
+Kubernetes wordt door vSphere ondersteund op 2 manieren: ofwel door gebruik te maken van de vSphere pods waarbij het beheer van de Docker containers nog steeds via de traditionele vSphere Admin verloopt, die een subset van de Kubernetes configuratie ondersteunt, ofwel via de Tanzu Kubernetes cluster. Dit is software van VMWare die apart kan worden geïnstalleerd en die de Kubernetes manier van werken ondersteunt en dus ook meer controle biedt over het beheer van de Kubernetes cluster.
 \newline
 \newline
 Momenteel wordt er nog geen Kubernetes gebruikt in het VIC en is Tanzu Kubernetes ook niet geïnstalleerd. Het integreren van Kubernetes is een omvangrijke taak waar op dit moment binnenin het VIC geen resources voor zijn (dit zou een bachelorproef op zichzelf zijn).
@@ -348,23 +344,22 @@ Containertechnologie zoals Docker containers en Docker Compose wordt al meer dan
 \newline
 \newline
 De volgende componenten zijn van belang om het gebruik van Kubernetes op VMware te begrijpen. De concepten van Kubernetes worden gelinkt aan VMWare concepten.
-\newline
-\newline
+
 \subsection{Nodes}
 Een Kubernetes node kan een virtuele of fysieke machine zijn die deel uitmaakt van een Kubernetes cluster en die centraal beheerd wordt.
 Er zijn 2 types nodes:
 \begin{itemize}
     \item ``master'' node: ook de ``control plane'' van Kubernetes genoemd. Deze controleert de volledige cluster en een cluster moet minstens 1 master node bevatten, en voor robuustheid typisch 2.
-    \item ``worker'' node: bevat de nodige services om Pods (zie verder) te kunnen starten, deze bevatten de containers.
+    \item ``worker'' node: bevat de nodige services om pods (zie verder) te kunnen starten, deze bevatten de containers.
 \end{itemize}
 \autocite{NirShtein2023}
 %\newline
 %\newline
 \subsection{Pod}
-Een Kubernetes Pod is een groep van 1 of meerdere containers die samen draaien in een gedeelde context. Een pod wordt beheerd door de Kubelet software die op elke Node draait, de Kubelet zorgt ervoor dat Pods herstart worden als ze onverwachts stoppen of als hun configuratie is gewijzigd. Die configuratie is gelijkaardig aan een Docker Compose file en bevat één of meerdere container definities, de poorten die opengesteld moeten worden, de opslagvolumes, environment variabelen, enz 
+Een Kubernetes pod is een groep van \'e\'en of meerdere containers die samen draaien in een gedeelde context. Een pod wordt beheerd door de Kubelet software die op elke Node draait, de Kubelet zorgt ervoor dat pods herstart worden als ze onverwachts stoppen of als hun configuratie is gewijzigd. Die configuratie is gelijkaardig aan een Docker Compose file en bevat één of meerdere container definities, de poorten die opengesteld moeten worden, de opslagvolumes, environment variabelen, enz 
 \autocite{NirShtein2023}.
 
-Een master node komt overeen met vCenter Server en een worker node is een machine waarop de ESXi hypervisor draait, en die dus kan Pods starten. Vanuit VMware Administrator standpunt is een Pod gelijkaardig aan een virtuele machine \autocite{VMware2019}.
+Een master node komt overeen met vCenter server en een worker node is een machine waarop de ESXi hypervisor draait, en die dus kan pods starten. Vanuit VMware Administrator standpunt is een Pod gelijkaardig aan een virtuele machine \autocite{VMware2019}.
 
 
 \subsection{Namespace}

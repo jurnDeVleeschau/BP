@@ -14,24 +14,27 @@
 % Heeft het onderzoek geleid tot nieuwe vragen die uitnodigen tot verder 
 %onderzoek?
 
-Het uitgangspunt van deze bachelorproef was om te onderzoeken of we tot een oplossing konden komen voor de installatie van Hadoop, Spark en Kafka op basis van containertechnologie, met extra aandacht voor security en stabiliteit, ter ondersteuning van de oefeningen en examens aan HOGENT.
+Het uitgangspunt van deze bachelorproef was om te onderzoeken of we tot een oplossing konden komen voor de installatie van Hadoop, Spark en Kafka op basis van container technologie, met extra aandacht voor security en stabiliteit, ter ondersteuning van de oefeningen en examens aan HOGENT.
 \newline
-De mogelijke containertechnologieën waren onder andere Docker en Kubernetes.
-\newline
-\newline
-Het zijn de aandachtspunten security en stabiliteit, en het mogelijke gebruik van Kubernetes, die ons in de richting van gescheiden omgevingen hebben geleid. TODO Gezien de mogelijke complexiteit van het opzetten van de Big Data oplossingen in een gedeelde cluster hoopten we op die manier ook een aantal zaken te kunnen vereenvoudigen om binnen de beperkte tijd van de bachelorproef een haalbare configuratie te bedenken en realiseren.
+De mogelijke container technologieën waren onder andere Docker en Kubernetes.
 \newline
 \newline
-Door gebruik te maken van een lokale Docker Desktop en Kubernetes omgeving hebben we aangetoond dat containertechnologie een mogelijke en interessante piste is voor dit soort installaties.
+Het zijn de aandachtspunten security en stabiliteit, en het mogelijke gebruik van Kubernetes, die in de richting van een oplossing met gescheiden omgevingen hebben geleid. 
 \newline
-Uiteindelijk bleek wel dat deze oplossing te veeleisend is voor de beschikbare resources op het VIC. De aanpak die we voor ogen hadden, en die we uitgewerkt hebben, zou eerder geschikt zijn voor een publieke cloud omgeving waar je zo goed als ongelimiteerd nodes kunt starten en stoppen, naargelang je behoeften, en waar er geen resources gebruikt worden (en er dus ook geen kosten zijn) op momenten dat de nodes niet nodig zijn en uit staan.
+Gezien de complexiteit van het opzetten van de Big Data oplossingen in een gedeelde cluster, zou onze oplossing een aantal zaken kunnen
+vereenvoudigen om een haalbare configuratie te realiseren.
 \newline
 \newline
-Voor installatie op het VIC moet er dus verder onderzoek gebeuren en rekening houdende met het feit dat er nog geen Kubernetes is geïnstalleerd en dat Docker Swarm eenvoudiger zou moeten zijn in gebruik en dat het minder resources gebruikt dan Kubernetes is dat de voor de hand liggende optie.
+Met het gebruik van een lokale Docker Desktop en Kubernetes omgeving wordt aangetoond dat container technologie een mogelijke en interessante piste is voor dit soort installaties.
+\newline
+De uitgewerkte oplossing blijkt te veeleisend te zijn voor de beschikbare resources op het VIC. Wat uitgewerkt is, is eerder geschikt voor een publieke cloud omgeving waar je zo goed als ongelimiteerd nodes kunt starten en stoppen in functie van de behoeften en waar op het moment dat er geen resources gebruikt worden de nodes uitstaan (inclusief dat er dus ook geen kosten aan verbonden zijn).
+\newline
+\newline
+Voor installatie op het VIC moet er dus verder onderzoek gebeuren en rekening houdende met het feit dat er nog geen Kubernetes is geïnstalleerd. Docker Swarm is dan een voor de handliggende optie welke eenvoudiger zal moeten zijn in gebruik en minder resources gebruikt dan Kubernetes.
 \newline
 De oplossing zou dan een gedeelde cluster zijn, en voor het security aspect moet in eerste instantie best gekeken worden naar Apache Ranger.
 \newline
-Onze grootste zorg bij een gedeelde cluster blijft het risico, zoals eerder vermeld, op de ``lawaaierige buur'', hiervoor hebben we volgende ideeën:
+De grootste zorg bij een gedeelde cluster blijft het risico, zoals eerder vermeld, op de ``lawaaierige buur'', hiervoor hebben we volgende ideeën:
 \newline
 \begin{itemize}
     \item Voldoende testen voorzien om de invloed van een zeer belastende query of programma op de andere gebruikers te meten.

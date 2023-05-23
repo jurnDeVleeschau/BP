@@ -1,4 +1,4 @@
-\begin{lstlisting}
+\begin{lstlisting}[basicstyle=\tiny]
 apiVersion: apps/v1
 kind: Deployment
 metadata:
