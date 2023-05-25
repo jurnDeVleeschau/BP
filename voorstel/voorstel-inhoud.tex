@@ -13,12 +13,12 @@ De bedoeling is dat de resultaten van dit onderzoek in de volgende jaren kunnen 
 \label{sec:state-of-the-art}
 Hadoop en Spark, beide ontwikkeld door de Apache Software Foundation, zijn veelgebruikte open-source frameworks voor big data- architecturen. Elk framework bevat open-source technologieën die big data sets voorbereiden, beheren en verwerken.
 Beiden verdelen de processing van grote data sets over een cluster van computernodes.
-Hadoop word vaak als basis voor een big data architecture gebruikt terwijl Spark sneller MapReduce doet door RAM te gebruiken en daardoor ook sneller is voor kleinere datasets die volledig in het RAM geheugen passen. Kafka word gebruikt naast Hadoop om real-time data streams te verzamelen.(\autocite{Hadoop} \autocite{Spark} \autocite{Kafka})
+Hadoop wordt vaak als basis voor een big data architecture gebruikt terwijl Spark sneller MapReduce doet door RAM te gebruiken en daardoor ook sneller is voor kleinere datasets die volledig in het RAM geheugen passen. Kafka wordt gebruikt naast Hadoop om real-time data streams te verzamelen.(\autocite{Hadoop} \autocite{Spark} \autocite{Kafka})
 Hadoop, Spark en Kafka worden al samen gebruikt volgens \autocite{Holmes2012}:
 'In this situation, you'd use Kafka to both land data on Hadoop and provide a feed into a real-time data-streaming system such as Storm or Spark Streaming, which you could then use to perform near-real-time computations.' en \autocite{Leang2019}:
 'one of the more significant findings to emerge from this study is that the integration of the Hadoop system especially Apache Kafka and Apache Spark enhances the performance and accuracy of data storing, processing, and securing in the manufacturing environment.'
 
-Er is informatie te vinden over het gebruik van Docker om verschillende combinaties van 2 van de 3 frameworks te installeren maar niks over alle 3 samen, zeker niet met de requirements die wij willen onderzoeken. 
+Er is informatie te vinden over het gebruik van Docker om verschillende combinaties van 2 van de 3 frameworks te installeren maar geen over alle 3 samen, zeker niet met de requirements van dit onderzoek. 
 
 % Voor literatuurverwijzingen zijn er twee belangrijke commando's:
 % \autocite{KEY} => (Auteur, jaartal) Gebruik dit als de naam van de auteur
@@ -31,7 +31,7 @@ Er is informatie te vinden over het gebruik van Docker om verschillende combinat
 \section{Methodologie}%
 \label{sec:methodologie}
 Het onderzoek wordt gestart met een studie van de installaties van Hadoop, Spark en Kafka, en hun configuratie en onderlinge samenhang.
-Met een focus op de requirements zoals vermeld in de Introductie, zoals bijvoorbeeld beveiliging en schaalbaarheid.
+Met een focus op de requirements zoals vermeld in de introductie, zoals bijvoorbeeld beveiliging en schaalbaarheid.
 Startpunt is de documentatie op de website van de verschillende tools. Ik verwacht ook relevante artikels op het web te vinden, met gedetailleerde voorbeelden uit de praktijk.
 Een bron van informatie is zeker ook de cursus van het vak ``Big Data Processing'', om een goed zicht te hebben op de manier waarop de tools worden gebruikt.
 

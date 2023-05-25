@@ -28,14 +28,14 @@ De schaalbaarheid bij Spark bijvoorbeeld, is doordat het werk verdeeld wordt ove
     \caption{Spark Worker Nodes \autocite{Spark2023e}.}
 \end{figure}
 
-Een van de onderdelen van Hadoop is YARN, een resource manager en job scheduler die instaat voor de verdeling van het werk over de verschillende cluster nodes en dus zorgt voor de schaalbaarheid. Zie figuur 3.2.
+Een van de onderdelen van Hadoop is YARN, een resource manager en job scheduler, die instaat voor de verdeling van het werk over de verschillende cluster nodes en dus zorgt voor de schaalbaarheid. Zie figuur 3.2.
 \newline
 \begin{figure}[H]
     \includegraphics[scale=0.7]{yarn_architecture.png}
     \caption{Hadoop YARN nodes en containers \autocite{Hadoop2023d}.}
 \end{figure}
 
-Merk op dat het bij real-world installaties van deze applicaties, het meestal de bedoeling is dat de Big Data oplossingen achterliggend gebruikt worden door eigen applicaties en dat gewone ``gebruikers'' op geen enkele manier rechtstreeks toegang krijgen tot bv. Hadoop of Spark.
+Merk op dat het bij real-world installaties van deze applicaties, het meestal de bedoeling is dat de Big Data oplossingen achterliggend gebruikt worden door eigen applicaties en dat gewone ``gebruikers'' op geen enkele manier rechtstreeks toegang krijgen tot bijvoorbeeld Hadoop of Spark.
 \newline
 Volgens \autocite{Hadoop2023} wordt in een standaard configuratie de Hadoop cluster eenvoudig beschermd door alle netwerk toegang te beperken. 
 Bij de meeste installaties zou dit volstaan als beveiliging, en krijgen enkel de gekende applicaties die er gebruik van maken de netwerk toegang tot de Big Data oplossingen.
@@ -134,11 +134,11 @@ Zoals ook aangehaald in het vorige stuk over stabiliteit, zal er bij een gedeeld
 \newline
 \newline
 \newline
-Gebaseerd op het voorgaande hebben we gekozen om testen uit te voeren met een oplossing waarbij elke student een eigen, volledige omgeving zou krijgen, volledig afgeschermd van de andere. Op die manier laten we het eerlijk verdelen van beschikbare resources (geheugen en CPU) over aan de container- en virtualisatietechnologie die hiervoor geschikter is.
+Gebaseerd op het voorgaande wordt een oplossing getest waarbij elke student een eigen, volledige omgeving zou krijgen, volledig afgeschermd van de andere. Op die manier worden de beschikbare resources (geheugen en CPU) eerlijk verdeeld over aan de container en virtualisatietechnologie die hiervoor geschikter is.
 \newline
 De nodige combinaties van containers, nodig voor de oefeningen of het examen, kunnen we opzetten door gebruik te maken van Docker Compose of Kubernetes files die een specifieke combinatie definiëren van de Big Data oplossingen. Voor elke student wordt dan naargelang de les de specifieke omgeving opgestart.
 \newline
-Merk op dat de Kubernetes of Docker Compose configuratie files die we verder in dit hoofdstuk gaan opbouwen het startpunt zijn voor elk van deze omgevingen, maar niet voldoende. De basis dient aangepast/uitgebreid te worden met specifieke configuraties gerelateerd aan de omgeving, zoals definitie van netwerken en adressen, volumes, enz. Dit zal verder onderzoek vragen, naargelang de uiteindelijke keuze van container cluster oplossing, om tot een finale oplossing te komen.
+Merk op dat de Kubernetes of Docker Compose configuratie files die we verder in dit hoofdstuk gaan opbouwen het startpunt zijn voor elk van deze omgevingen, maar dat is niet voldoende. De basis dient aangepast/uitgebreid te worden met specifieke configuraties gerelateerd aan de omgeving, zoals definitie van netwerken en adressen, volumes, enz. Dit zal verder onderzoek vragen, naargelang de uiteindelijke keuze van container cluster oplossing, om tot een finale oplossing te komen.
 \newline
 De roll-out kan geautomatiseerd worden maar betekent dat de docent toegang moet hebben tot Kubernetes, Docker Swarm of een VIC UI omgeving om het uit te voeren.
 \newline
@@ -185,8 +185,7 @@ Omdat de inloggegevens in de header van elk HTTP(S)-verzoek moeten worden verzon
 \newline
 \newline
 Basic Authentication lijkt me voldoende, per omgeving moeten dan de inloggegevens voor \'e\'en gebruiker, de student, opgezet worden. Nginx ondersteunt meerdere mechanismen voor authenticatie waaronder een eenvoudig paswoord bestand. Deze is in het formaat
-\newline
-\newline
+
 \begin{lstlisting}
     user1:$apr1$/woC1jnP$KAh0SsVn5qeSMjTtn0E9Q0
     user2:$apr1$QdR8fNLT$vbCEEzDj7LyqCMyNpSoBh/
@@ -215,7 +214,7 @@ Initieel waren er hier problemen met het configureren van de volumes omdat Kuber
 \newline
 In de ConfigMap werd de nginx.conf file toegevoegd en de paswoord file voor Basic Authentication.
 Uiteindelijk met volgende configuratie kwam de popup voor Basic Authentication te voorschijn.
-\newpage
+\newline
 Definitie van de nginx container, met verwijzen naar de nginx.conf file voor de configuratie en de password.conf file voor de definitie van gebruikers en paswoorden:
 \newline
 \begin{lstlisting}
@@ -283,7 +282,7 @@ De password.conf file:
 Merk op dat het niet de bedoeling is om manueel htpasswd uit te voeren voor de gebruikersnaam en paswoord van alle studentomgevingen, dat moet geautomatiseerd worden, door de credentials rechtstreeks in een secret te bewaren en een eigen Docker image maken die op basis van het secret de htpasswd uitvoert.
 
 \section{Hadoop}
-Daarna werd Hadoop toegevoegd en de configuratie voor nginx om als Reverse Proxy gebruikt te worden voor Hadoop. Hierbij is vertrokken van de Docker Compose file die was opgebouwd en getest in vorige stappen, en werden alle Hadoop gerelateerde configuraties toegevoegd aan de Kubernetes file. Tijdens het opstarten kwamen er een aantal problemen de voorschijn in de logs. De namenode was niet bereikbaar voor de datanode, resourcemanager en historyserver.
+Daarna werd Hadoop toegevoegd en de configuratie voor nginx om als Reverse Proxy gebruikt te worden voor Hadoop. Hierbij is vertrokken van de Docker Compose file die was opgebouwd en getest in vorige stappen, en werden alle Hadoop gerelateerde configuraties toegevoegd aan de Kubernetes file. Tijdens het opstarten kwamen er een aantal problemen tevoorschijn in de logs. De namenode was niet bereikbaar voor de datanode, resourcemanager en historyserver.
 In een Docker compose file worden alle containers verbonden via \'e\'en of meerdere virtuele netwerken, en zorgt Docker ervoor dat de containers naar elkaar kunnen verwijzen door middel van de containernaam. Dit is niet het geval bij Kubernetes, waar de naam van de pod waarop de container draait, moet worden gebruikt. Aangezien in onze oplossing alle containers voor \'e\'en student op dezelfde pod draaien kunnen we ook 'localhost' gebruiken.\newline
 In de configuratie voor Kubernetes moesten dus bij alle containers de verwijzingen naar andere containers (hostnamen) vervangen worden door 'localhost'.
 \newline
@@ -291,7 +290,7 @@ In de configuratie voor Kubernetes moesten dus bij alle containers de verwijzing
 Om de configuratie van Hadoop aan te passen zijn er 2 manieren, ofwel gebruikmakende van environment variabelen gedefinieerd rechtstreeks op de container ofwel met environment variabelen gedefinieerd in een aparte ConfigMap. Typisch worden beiden gebruikt, in de ConfigMap stoppen we variabelen die voor alles containers gelijk zijn, en waar alle containers naar verwijzen zodat dit maar op \'e\'en plaats gewijzigd dient te worden, en de variabelen die specifiek zijn voor elke container worden daar aan toegevoegd. Een voorbeeld van de laatste soort is SERVICE\_PRECONDITION die een manier is om te bepalen op welke andere containers moet gewacht worden. Dit is een mechanisme van Apache, waarbij een specifieke applicatie wacht met opstarten tot het contact krijgt met die andere applicatie.
 \newline
 \newline
-Eens Hadoop werkende in Kubernetes, werd de reverse proxy configuratie van nginx aangepakt. Eerst door een Hadoop context toe te voegen aan de URL, bv http://localhost/hadoop, en die dan via de nginx proxy\_pass door te sturen naar Hadoop, met volgende configuratie:
+Eens Hadoop werkende in Kubernetes, werd de reverse proxy configuratie van nginx aangepakt. Eerst door een Hadoop context toe te voegen aan de URL, bijvoorbeeld http://localhost/hadoop, en die dan via de nginx proxy\_pass door te sturen naar Hadoop, met volgende configuratie:
 \newline
 \newline
 \begin{lstlisting}
@@ -338,7 +337,7 @@ Bij surfen in de browser naar http://www.hadoop.local, kwam er nu eerst de user/
 Om de installatie veiliger te maken is er beslist om HTTPS op te zetten. Het is voldoende om dit op nginx te configureren want dat is de enige server en enige communicatie die van buitenaf zichtbaar is en dus mogelijk kan bespioneerd worden. Het opzetten van SSL op een aparte server, nginx in dit geval, noemt men 'SSL off-loading'.
 \newline
 Er zijn nog een aantal voordelen dat dit enkel op de nginx server moet gebeuren:
-\newline
+
 \begin{itemize}
     \item Performantie: SSL maakt zwaar gebruik van de CPU en op deze manier worden de andere containers hiermee niet belast.
     \item Certificaat beheer: installatie en onderhoud van de certificaten moet maar op \'e\'en plaats gebeuren.
@@ -352,8 +351,7 @@ Om SSL op te zetten bij nginx is een certificaat nodig. Voor de lokale testen we
 \newline
 \newline
 Met volgende commando werd een certificaat aangemaakt dat vanuit de Docker container bewaard werd op de laptop.
-\newline
-\newline
+
 \begin{lstlisting}
     docker run -ti --rm -v \$(pwd):/apps -w /apps alpine/openssl <openssl\_command>
 \end{lstlisting}
@@ -409,7 +407,7 @@ De SSL certificaten worden aan een Kubernetes tls secret toegevoegd als volgt:
 
 \section{Spark}
 
-De volgende stap was een Kubernetes yaml bestand voor de combinatie Nginx, Hadoop en Spark. Dit verliep vlot, vooral dezelfde problemen als bij Hadoop, docker container namen die omgezet moesten worden naar localhost, enz die we intussen al snel herkenden.
+De volgende stap was een Kubernetes yaml bestand voor de combinatie Nginx, Hadoop en Spark. Dit verliep vlot, met dezelfde problemen als bij Hadoop, docker container namen die omgezet moesten worden naar localhost, enz die we intussen al snel herkenden.
 \newline
 \newline
 Docker Compose biedt een functionaliteit die in Kubernetes niet bestaat, namelijk 'depends\_on'. Deze laat toe om de afhankelijkheid van containers te definiëren zodat containers niet starten voordat andere nodige containers zijn gestart. Dit wordt gebruikt bij Spark worker die (depends\_on) Spark master nodig heeft.
@@ -439,113 +437,86 @@ Kafka ondersteunt meerdere beveiligingsmechanismes waaronder SASL/PLAIN, een een
 Dit werd opgezet in een ConfigMap en toegevoegd aan de configuratie van Kafka en Zookeeper als volgt:
 \newline
 \newline
-Acl: Access-control list
-\newline
-https://kafka.apache.org/documentation.html
-\newline
 Kafka server.properties:
-Line 2: Security protocol used to communicate between brokers. Valid values are: PLAINTEXT, SSL, SASL\_PLAINTEXT, SASL\_SSL. It is an error to set this and inter.broker.listener.name properties at the same time.
-Line 3: SASL mechanism used for inter-broker communication. Default is GSSAPI.
-Line 4: The list of SASL mechanisms enabled in the Kafka server. The list may contain any mechanism for which a security provider is available. Only GSSAPI is enabled by default.
-Line 6: The fully qualified name of a class that implements org.apache.kafka.server.authorizer.Authorizer interface, which is used by the broker for authorization.
-Line 7: if a resource has no associated ACLs, then no one is allowed to access that resource except super users. If you want to change that behavior, you can include the following in server.properties
-Line 8: Enable auto creation of topic on the server
-Line 9: Listener List - Comma-separated list of URIs we will listen on and the listener names. If the listener name is not a security protocol, listener.security.protocol.map must also be set.
-Listener names and port numbers must be unique.
-Specify hostname as 0.0.0.0 to bind to all interfaces.
-Leave hostname empty to bind to default interface.
-Examples of legal listener lists:
-PLAINTEXT://myhost:9092,SSL://:9091
-CLIENT://0.0.0.0:9092,REPLICATION://localhost:9093
-Line 10:Listeners to publish to ZooKeeper for clients to use, if different than the listeners config property. In IaaS environments, this may need to be different from the interface to which the broker binds. If this is not set, the value for listeners will be used. Unlike listeners, it is not valid to advertise the 0.0.0.0 meta-address.
-Also unlike listeners, there can be duplicated ports in this property, so that one listener can be configured to advertise another listener's address. This can be useful in some cases where external load balancers are used.
-Line 12: ?
-Line 13: Specifies the ZooKeeper connection string in the form hostname:port where host and port are the host and port of a ZooKeeper server. To allow connecting through other ZooKeeper nodes when that ZooKeeper machine is down you can also specify multiple hosts in the form hostname1:port1,hostname2:port2,hostname3:port3.
-The server can also have a ZooKeeper chroot path as part of its ZooKeeper connection string which puts its data under some path in the global ZooKeeper namespace. For example to give a chroot path of /chroot/path you would give the connection string as hostname1:port1,hostname2:port2,hostname3:port3/chroot/path.
-
-Kafka consumer.properties:
-Line 2: Protocol used to communicate with brokers. Valid values are: PLAINTEXT, SSL, SASL\_PLAINTEXT, SASL\_SSL.
-Line 3: SASL mechanism used for client connections. This may be any mechanism for which a security provider is available. GSSAPI is the default mechanism.
-Line 4: Specifies the ZooKeeper connection string in the form hostname:port where host and port are the host and port of a ZooKeeper server. To allow connecting through other ZooKeeper nodes when that ZooKeeper machine is down you can also specify multiple hosts in the form hostname1:port1,hostname2:port2,hostname3:port3.
-The server can also have a ZooKeeper chroot path as part of its ZooKeeper connection string which puts its data under some path in the global ZooKeeper namespace. For example to give a chroot path of /chroot/path you would give the connection string as hostname1:port1,hostname2:port2,hostname3:port3/chroot/path.
-
-Kafka producer.properties:
-Line 2: SASL mechanism used for client connections. This may be any mechanism for which a security provider is available. GSSAPI is the default mechanism.
-Line 3: Protocol used to communicate with brokers. Valid values are: PLAINTEXT, SSL, SASL\_PLAINTEXT, SASL\_SSL.
-Line 4: JAAS login context parameters for SASL connections in the format used by JAAS configuration files. JAAS configuration file format is described here. The format for the value is: loginModuleClass controlFlag (optionName=optionValue)*;. For brokers, the config must be prefixed with listener prefix and SASL mechanism name in lower-case. For example, listener.name.sasl\_ssl.scram-sha-256.sasl.jaas.config=com.example.ScramLoginModule required;
-Line 5: username
-Line 6: password
-Line 7: A list of host/port pairs to use for establishing the initial connection to the Kafka cluster. The client will make use of all servers irrespective of which servers are specified here for bootstrapping—this list only impacts the initial hosts used to discover the full set of servers. This list should be in the form host1:port1,host2:port2,.... Since these servers are just used for the initial connection to discover the full cluster membership (which may change dynamically), this list need not contain the full set of servers (you may want more than one, though, in case a server is down).
-
-Zookeeper zookeeper.properties:
-Line 2: ?
-Line 3: ?
-Line 4: ?
-Line 5: ?
-
-Zookeeper zookeeper\_jaas.conf:
-Line 3: ?
-Line 4:
-Line 5:
-Line 6:
-Line 7:
-
-Line 9:
-Line 10:
-Line 11:
-
-
-Kafka kafka\_server\_jaas.conf:
-Line 3: ?
-Line 4:
-Line 5:
-Line 6:
-
-Line 9:
-Line 10:
-Line 11:
-
-Kafka properties:
 \begin{lstlisting}
     server.properties: |
-    security.inter.broker.protocol=SASL_PLAINTEXT # Security mechanisme
-    sasl.mechanism.inter.broker.protocol=PLAIN  # Security mechanisme
-    sasl.enabled.mechanisms=PLAIN
+        listeners=SSL://localhost:9092,SASL_SSL://localhost:9093
+        security.inter.broker.protocol=SSL
+        ssl.client.auth=required
     
-    authorizer.class.name=kafka.security.auth.SimpleAclAuthorizer
-    allow.everyone.if.no.acl.found=true
-    auto.create.topics.enable=false
-    listeners=SASL_PLAINTEXT://localhost:9092  # Protocol SASL_PLAINTEXT
-    advertised.listeners=SASL_PLAINTEXT://localhost:9092 # Protocol SASL_PLAINTEXT
+        ssl.truststore.location=/var/ssl/private/kafka.server.truststore.jks
+        ssl.truststore.password=password1234
+        ssl.keystore.location=/var/ssl/private/kafka.server.keystore.jks
+        ssl.keystore.password=password1234
     
-    advertised.host.name=localhost
-    zookeeper.connect=localhost:2181
+        sasl.enabled.mechanisms=PLAIN
+        
+        authorizer.class.name=kafka.security.auth.SimpleAclAuthorizer
+        allow.everyone.if.no.acl.found=true
+        auto.create.topics.enable=false
+        advertised.listeners=SASL_SSL://localhost:9092
+        
+        zookeeper.connect=localhost:2181
 \end{lstlisting}
 
-\begin{lstlisting}
-    consumer.properties: |
-    security.protocol=SASL_PLAINTEXT
-    sasl.mechanism=PLAIN
-    zookeeper.connect=localhost:2181
-\end{lstlisting}
+Lijn 1, Naam van het bestand in de ConfigMap 
+\newline
+Lijn 2, listeners = De lijst van URIs (protocol, hostnaam en poort) waarop Kafka zal luisteren voor inkomende verbindingen. SSL protocol voor inter-broker. SASL\_SSL voor clients.
+\newline
+Lijn 3, security.inter.broker.protocol = Het protocol dat gebruikt wordt om te communiceren tussen de brokers onderling, SSL in ons geval.
+\newline
+Lijn 4, ssl.client.auth = Clients moeten zich authenticeren. \newline
+sasl.mechanism.inter.broker.protocol = Het SASL mechanisme dat gebruikt wordt voor de onderlinge broker communicatie.
+\newline
+Lijn 6, ssl.truststore.location = Locatie van de truststore die het certificaat bevat.
+\newline
+Lijn 7, ssl.truststore.password = Truststore paswoord
+\newline
+Lijn 8, ssl.keystore.location = Locatie van de keystore die het certificaat en private key bevat.
+\newline
+Lijn 9, ssl.keystore.password = Keystore paswoord
+\newline
+Lijn 11, sasl.enabled.mechanisms = De lijst van SASL mechanisms die actief zijn in de Kafka server.
+\newline
+Lijn 13, authorizer.class.name = De volledige naam van de Java klasse die de Authorizatie zal doen (apache.kafka.server.authorizer.Authorizer interface).
+\newline
+Lijn 14, allow.everyone.if.no.acl.found = Als een resource geen toegangscontrole lijst heeft, laat dan iedereen toe (true).
+\newline
+Lijn 15, auto.create.topics.enable = Als dit op true staat zal Kafka automatisch nieuwe topics aanmaken als er boodschappen gestuurd worden naar niet bestaande topics. 
+\newline
+Lijn 16, advertised.listeners = De lijst van listener URIs (protocol, hostnaam en poort) die naar ZooKeeper worden gepubliceerd.
+\newline
+Lijn 18, zookeeper.connect = het adres van ZooKeeper
+\newline
 
+Configuratie files consumer.properties en producer.properties worden gebruikt door Kafka consumers en producers voor connectie en authenticatie:
 \begin{lstlisting}
-    producer.properties: |
+    security.protocol=SASL_SSL
     sasl.mechanism=PLAIN
-    security.protocol=SASL_PLAINTEXT
     sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required
-    username="admin"
-    password="admin-secret";
+    username=admin
+    password=admin-secret
     bootstrap.servers=localhost:9092
 \end{lstlisting}
+
+Lijn 1, security.protocol = Het protocol om te communiceren met de broker, SASL\_SSL in ons geval.
+\newline
+Lijn 2, sasl.mechanism = Het SASL mechanisme dat gebruikt moet worden voor verbindigen met de broker. Hier is gekozen voor PLAIN.
+\newline
+Lijn 3, sasl.jaas.config = JAAS login context parameters voor SASL verbindigen. Dit is in een formaat als volgt: loginModuleClass controlFlag (optionName=optionValue)*.
+\newline
+Lijnen 4 en 5 zijn de gebruikersnaam en paswoord om de client te identificeren bij de broker.
+\newline
+Lijn 6, bootstrap.servers = Een lijst van host en poort combinaties voor de eerste connectie naar de Kafka cluster.
+\newline
 
 Zookeeper configuratie:
 \begin{lstlisting}
     zookeeper.properties: |
-    authProvider.1=org.apache.zookeeper.server.auth.SASLAuthenticationProvider
-    requireClientAuthScheme=sasl
-    jaasLoginRenew=3600000
-    clientPort=2181
+        authProvider.1=org.apache.zookeeper.server.auth.SASLAuthenticationProvider
+        requireClientAuthScheme=sasl
+        jaasLoginRenew=3600000
+        clientPort=2181
 \end{lstlisting}
 
 \begin{lstlisting}
@@ -580,14 +551,13 @@ Configuratie van de gebruikers:
     };
 \end{lstlisting}
 
-Na deze wijziging moest het Kafka producer voorbeeld uit de oefeningen de juiste credentials doorgeven aan Kafka anders werd het geweigerd.
+Na deze wijziging bleven de broker en Zookeeper met elkaar communiceren en moest het Kafka producer voorbeeld uit de oefeningen de juiste credentials doorgeven aan Kafka anders werd het geweigerd.
 
 \section{Geheugen gebruik van de oplossing}
 De volgende screenshots (figuren 3.3, 3.4, 3.5 en 3.6) zijn gemaakt na deployment van de Hadoop omgeving in 1 pod en in 2 pods. Daarvoor werd het volgende commando uitgevoerd:
 \begin{lstlisting}
     docker stats
 \end{lstlisting}
-
 
 Elke pod gebruikt ongeveer evenveel geheugen, dus voor elke student omgeving komt hetzelfde geheugengebruik, zon'n 750 MB, erbij.
 
@@ -617,6 +587,6 @@ Hadoop heeft dus duidelijk de grootste invloed en alles bij elkaar genomen is de
 \newline
 Dit is trouwens het verwachte minimale geheugengebruik, afhankelijk van de verwerkingsapplicaties en de data sets zal daar nog bijkomen.
 \newline
-Het VIC beheert PowerEdge M640 en PowerEdge R640 servers (CPU: 16 cores/32 threads @ 2.10GHz, RAM: 192.0 GB), dus zou vermoedelijk onze oplossing, die wat geheugengebruik betreft naar de 60 GB gaat, wel aankunnen.
+Het VIC beheert PowerEdge M640 en PowerEdge R640 servers (CPU: 16 cores/32 threads @ 2.10GHz, RAM: 192.0 GB), en zou dus vermoedelijk onze oplossing, die wat geheugengebruik betreft naar de 60 GB gaat, wel aankunnen.
 Maar dan zou een groot deel van de resources van het VIC ingenomen worden, enkel door deze oplossing. Dit is niet in verhouding tot wat de oplossing biedt, aan 60 studenten voor \'e\'en vak, dus moet de piste van de gedeelde omgeving ook onderzocht worden.
 

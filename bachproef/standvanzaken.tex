@@ -91,8 +91,7 @@ Als container technologie is Docker gekozen voor de volgende redenen:
 \end{itemize}
 
 De voorgestelde oplossing zou kunnen bestaan uit meerdere docker-compose files, telkens voor één van de Big Data applicaties of een combinatie ervan. Zoals ook verder beschreven bestaat elke applicatie uit meerdere processen die elk in één container kunnen draaien. Dit moet verder uitgezocht worden.
-\newline
-\newline
+
 
 \subsection{Docker en containerd}
 Om het voorgaande enigzins overzichtelijk te houden, en ook om historische redenen want ``docker'' was de eerste tool van Docker, wordt er gesproken over ``Docker'' containers als overkoepelende benaming van alle functionaliteit die geboden wordt maar er zit intussen veel meer achter dan enkel de docker tool, die nu is hernoemd naar Docker Desktop (voor ontwikkelaars op Windows, Mac en Linux) en Docker Engine (voor servers op Linux).
@@ -108,8 +107,8 @@ Een goede introductie tot dit alles is te vinden in \textcite{Donohue2023}.
 
 \subsection{Cluster}
 Een cluster is een groep van computers, clusternodes genaamd, die samenwerken en zich naar de gebruiker toe als \'e\'en enkel systeem gedragen. Het concept van een cluster is dat het werk wordt verdeeld over de verschillende nodes.
-Dit heeft meerdere voordelen:
 \newline
+Dit heeft meerdere voordelen:
 \begin{itemize}
     \item Door de architectuur van samenwerking kan een cluster eenvoudig en in theorie ongelimiteerd uitgebreid worden met bijkomende nodes, in tegenstelling tot oplossingen die slechts op \'e\'en enkele machine draaien en die dan beperkt worden door de fysieke limieten van de machine (Scalability).
     \item Bij de meeste applicaties is de belasting niet continu dezelfde en een cluster architectuur laat toe om, volgens de actuele vraag, bijkomende nodes op te starten en later terug af te sluiten. Dit spaart resources en maakt nodes ook beschikbaar voor andere applicaties.
@@ -195,8 +194,6 @@ Door op die manier met aparte images te werken kan het beheer van de cluster bui
 \newline
 \newline
 In de volgende sectie wordt Apache Spark bekeken, welke functionaliteit dit toevoegt aan Hadoop en hoe dit kan geïntegreerd worden.
-\newline
-\newline
 
 \section{Spark}
 Apache Spark is net als Hadoop een Open Source framework bedoeld voor het verwerken van grote datasets. Volgens \textcite{AwsAmazon2023a} verdeelt Spark ook de gegevens en de taken over verschillende nodes, maar houdt het data daarbij zoveel mogelijk in cache (RAM geheugen), in plaats van in een bestandssysteem. Voor bepaalde gevallen zal het dus veel sneller zijn dan Hadoop.
@@ -258,7 +255,7 @@ In de terminologie van Kafka vormt een event een record dat opgeslagen wordt.
 
 
 \subsection{Kafka Topic}
-Volgens \textcite{Harbour2023} kan een topic gezien worden als een soort logisch kanaal waarlangs de communicatie tussen producer en consumer verloopt. Een producer stuurt dus Events naar een specifiek topic en een consumer gaat Events opvragen in datzelfde topic. Het topic is dus een begrip dat beiden kennen en een manier om ze aan elkaar te koppelen.
+Volgens \textcite{Harbour2023} kan een topic gezien worden als een soort logisch kanaal waarlangs de communicatie tussen producer en consumer verloopt. Een producer stuurt dus events naar een specifiek topic en een consumer gaat events opvragen in datzelfde topic. Het topic is dus een begrip dat beiden kennen en een manier om ze aan elkaar te koppelen.
 
 
 \subsection{Kafka Partition}
@@ -280,8 +277,7 @@ Volgens \textcite{Harbour2023} speelt de sleutel van een event een belangrijke r
 \end{figure}
 
 Om vorig scenario te vermijden worden events aan partities toegewezen op basis van de sleutel van het event. Het is dus aan de producer om de juiste sleutel te kiezen, in dit geval ``Jan'', om ervoor te zorgen dat beide events op dezelfde partitie komen en allebei in de juiste volgorde aan de consumer worden bezorgd.
-\newline
-\newline
+
 
 
 \section{Zookeeper}
@@ -294,8 +290,6 @@ Bij Apache Kafka werd Zookeeper gebruikt voor metadata beheer, bijvoorbeeld bijh
 \newline
 \newline
 Afhankelijk van de versie van Kafka die wordt gebruikt kan Zookeeper wel of niet toegevoegd worden aan de oplossing.
-\newline
-\newline
 
 \section{Big Data software Docker images}
 Enkele van de Docker images die tijdens de cursus gebruikt worden zijn die van Big Data Europe. Dit is een project van de Europse Unie dat liep van 2015 tot 2017.
@@ -329,15 +323,18 @@ Deze oplossing ondersteunt ook het deployen van Multi-Container Applicaties, o.a
 Volgens \textcite{VMware2021} is Kubernetes intussen de de-facto standaard geworden voor de orchestratie en het beheer van containers op grote schaal, dus zijn Docker containers en Kubernetes nu geïntegreerd vanaf vSphere versie 7. De 'vSphere Integrated Containers' oplossing van vSphere 6 wordt niet langer ondersteund en ook Docker Compose niet meer.
 \newline
 \newline
-Kubernetes wordt door vSphere vooral ondersteund om ontwikkelaars te laten werken met de door hun gekende tools, begrippen, Kubernetes configuratie files en processen zodat ze zich niet moeten verdiepen in VMWare vSphere. Ze hebben dan ook geen directe toegang of kennis nodig van de vSphere software.\autocite{VMware2019}
+Kubernetes wordt door vSphere vooral ondersteund om ontwikkelaars te laten werken met de door hun gekende tools, begrippen, Kubernetes configuratie files en processen zodat ze zich niet moeten verdiepen in VMWare vSphere. Ze hebben dan ook geen directe toegang of kennis nodig van de vSphere software \autocite{VMware2019}.
 \newline
 \newline
 Daarnaast worden ook Docker containers ondersteund door VMWare vSphere, dus dit is een mogelijke oplossing zonder Kubernetes.
 \newline
 \newline
-Kubernetes wordt door vSphere ondersteund op 2 manieren: ofwel door gebruik te maken van de vSphere pods waarbij het beheer van de Docker containers nog steeds via de traditionele vSphere Admin verloopt, die een subset van de Kubernetes configuratie ondersteunt, ofwel via de Tanzu Kubernetes cluster. Dit is software van VMWare die apart kan worden geïnstalleerd en die de Kubernetes manier van werken ondersteunt en dus ook meer controle biedt over het beheer van de Kubernetes cluster.
-\newline
-\newline
+Kubernetes wordt door vSphere ondersteund op 2 manieren: 
+\begin{itemize}
+    \item Ofwel door gebruik te maken van de vSphere pods waarbij het beheer van de Docker containers nog steeds via de traditionele vSphere Admin verloopt, die een subset van de Kubernetes configuratie ondersteunt<
+    \item Ofwel via de Tanzu Kubernetes cluster. Dit is software van VMWare die apart kan worden geïnstalleerd en die de Kubernetes manier van werken ondersteunt en dus ook meer controle biedt over het beheer van de Kubernetes cluster.
+\end{itemize}
+
 Momenteel wordt er nog geen Kubernetes gebruikt in het VIC en is Tanzu Kubernetes ook niet geïnstalleerd. Het integreren van Kubernetes is een omvangrijke taak waar op dit moment binnenin het VIC geen resources voor zijn (dit zou een bachelorproef op zichzelf zijn).
 \newline
 Containertechnologie zoals Docker containers en Docker Compose wordt al meer dan een jaar gebruikt, waarbij de Docker Engine geïnstalleerd is in virtuele machines.
