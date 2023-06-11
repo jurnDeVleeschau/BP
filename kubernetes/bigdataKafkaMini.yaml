@@ -276,17 +276,23 @@ data:
     </body>
     </html>
   server.properties: |
-    security.inter.broker.protocol=SASL_PLAINTEXT
-    sasl.mechanism.inter.broker.protocol=PLAIN
+    listeners=SSL://localhost:9092,SASL_SSL://localhost:9093
+    security.inter.broker.protocol=SSL
+    ssl.client.auth=required
+
+    ssl.truststore.location=/var/ssl/private/kafka.server.truststore.jks
+    ssl.truststore.password=password1234
+
+    ssl.keystore.location=/var/ssl/private/kafka.server.keystore.jks
+    ssl.keystore.password=password1234
+
     sasl.enabled.mechanisms=PLAIN
 
     authorizer.class.name=kafka.security.auth.SimpleAclAuthorizer
     allow.everyone.if.no.acl.found=true
     auto.create.topics.enable=false
-    listeners=SASL_PLAINTEXT://localhost:9092
-    advertised.listeners=SASL_PLAINTEXT://localhost:9092
+    advertised.listeners=SASL_SSL://localhost:9092
 
-    advertised.host.name=localhost
     zookeeper.connect=localhost:2181
   zookeeper.properties: |
     authProvider.1=org.apache.zookeeper.server.auth.SASLAuthenticationProvider
@@ -294,15 +300,19 @@ data:
     jaasLoginRenew=3600000
     clientPort=2181
   consumer.properties: |
-    security.protocol=SASL_PLAINTEXT
+    security.protocol=SASL_SSL
     sasl.mechanism=PLAIN
-    zookeeper.connect=localhost:2181
-  producer.properties: |
-    sasl.mechanism=PLAIN
-    security.protocol=SASL_PLAINTEXT
     sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required
-    username="admin"
-    password="admin-secret";
+    username=admin
+    password=admin−secret
+    bootstrap.servers=localhost:9092
+
+  producer.properties: |
+    security.protocol=SASL_SSL
+    sasl.mechanism=PLAIN
+    sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required
+    username=admin
+    password=admin−secret
     bootstrap.servers=localhost:9092
   zookeeper_jaas.conf: |
     Server {
